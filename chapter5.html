@@ -1306,35 +1306,26 @@
             document.querySelector('.progress-bar').style.width = scrollPercent + '%';
         }
 
-        // Card toggle system
+        // Card toggle system (explicit open/close, no document-level handler)
         function setupCardToggle() {
-            const germanWords = document.querySelectorAll('.german-word');
-            germanWords.forEach(word => {
+            document.querySelectorAll('.german-word').forEach(word => {
                 word.addEventListener('click', function(e) {
+                    e.preventDefault();
                     e.stopPropagation();
                     const cardId = this.dataset.term;
                     const card = document.getElementById(cardId);
-
-                    // Close all other cards
-                    document.querySelectorAll('.ety-card.visible').forEach(c => {
-                        if (c !== card) c.classList.remove('visible');
-                    });
-
-                    // Toggle this card
                     if (card) {
-                        card.classList.toggle('visible');
-                        this.classList.toggle('active-card');
+                        const isOpen = card.classList.contains('visible');
+                        // Close all cards first
+                        document.querySelectorAll('.ety-card.visible').forEach(c => c.classList.remove('visible'));
+                        document.querySelectorAll('.german-word.active-card').forEach(w => w.classList.remove('active-card'));
+                        // Open this one if it wasn't already open
+                        if (!isOpen) {
+                            card.classList.add('visible');
+                            this.classList.add('active-card');
+                            setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+                        }
                     }
-                });
-            });
-
-            // Close cards when clicking outside
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.ety-card.visible').forEach(c => {
-                    c.classList.remove('visible');
-                });
-                document.querySelectorAll('.german-word.active-card').forEach(w => {
-                    w.classList.remove('active-card');
                 });
             });
         }
@@ -1349,12 +1340,20 @@
                 opt.disabled = true;
                 if (opt === button) {
                     opt.classList.add(isCorrect ? 'correct' : 'incorrect');
-                } else {
-                    opt.classList.add('incorrect');
+                } else if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+                    // Highlight the correct answer so the learner can see it
+                    opt.classList.add('correct');
                 }
             });
 
-            feedback.classList.add('visible');
+            if (isCorrect) {
+                feedback.classList.add('visible');
+            } else {
+                // Show a "not quite" message, then reveal the correct explanation
+                const originalHTML = feedback.innerHTML;
+                feedback.innerHTML = '<strong>Not quite!</strong> Here\'s what happened — ' + originalHTML.replace(/<strong>Correct!<\/strong>\s*/, '');
+                feedback.classList.add('visible');
+            }
         }
 
         // Start button
@@ -1370,13 +1369,10 @@
             window.addEventListener('scroll', updateProgressBar);
         });
 
-        // Handle touch for mobile
-        document.addEventListener('touchstart', function(e) {
-            const germanWord = e.target.closest('.german-word');
-            if (germanWord) {
-                germanWord.click();
-            }
-        }, { passive: true });
+        // Mobile: prevent double-tap zoom on interactive elements
+        document.querySelectorAll('.guess-option, .german-word, .cta-button').forEach(el => {
+            el.addEventListener('touchend', e => { e.preventDefault(); el.click(); });
+        });
 
         // Responsive particle adjustment
         window.addEventListener('resize', function() {

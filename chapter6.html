@@ -167,6 +167,7 @@
             flex-direction: column;
             justify-content: flex-start;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             padding: 0;
             z-index: 20;
         }
@@ -968,15 +969,25 @@
             buttons.forEach(btn => {
                 btn.disabled = true;
                 btn.style.opacity = '0.6';
+                // Highlight the correct answer
+                if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes('true')) {
+                    btn.classList.add('correct');
+                    btn.style.opacity = '1';
+                }
             });
 
             if (isCorrect) {
                 button.classList.add('correct');
+                button.style.opacity = '1';
             } else {
                 button.classList.add('incorrect');
             }
 
             if (feedback) {
+                if (!isCorrect) {
+                    const originalHTML = feedback.innerHTML;
+                    feedback.innerHTML = '<strong>Not quite!</strong> ' + originalHTML.replace(/^(Exactly!|Yes!|Right!)\s*/i, '');
+                }
                 feedback.classList.add('show');
             }
         }
@@ -1002,19 +1013,10 @@
 
         // TOUCH OPTIMIZATIONS
         function addTouchOptimizations() {
-            document.addEventListener('touchmove', function(e) {
-                // Allow natural scrolling
-            }, { passive: true });
-
-            // Prevent zoom on double tap
-            let lastTouchEnd = 0;
-            document.addEventListener('touchend', function(e) {
-                const now = Date.now();
-                if (now - lastTouchEnd <= 300) {
-                    e.preventDefault();
-                }
-                lastTouchEnd = now;
-            }, false);
+            // Prevent double-tap zoom on interactive elements only
+            document.querySelectorAll('.quiz-btn, .btn').forEach(el => {
+                el.addEventListener('touchend', e => { e.preventDefault(); el.click(); });
+            });
         }
 
         // INIT

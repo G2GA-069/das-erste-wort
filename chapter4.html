@@ -1337,14 +1337,20 @@
             word.style.animationDelay = (delay * 100) + 'ms';
         });
 
-        // Etymology Card Toggle
+        // Etymology Card Toggle (open/close, not toggle — prevents mobile double-fire)
         document.querySelectorAll('.german-word').forEach(word => {
             word.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 const cardId = this.dataset.card;
                 const card = document.getElementById('card-' + cardId);
                 if (card) {
-                    card.classList.toggle('active');
+                    const isOpen = card.classList.contains('active');
+                    document.querySelectorAll('.ety-card.active').forEach(c => c.classList.remove('active'));
+                    if (!isOpen) {
+                        card.classList.add('active');
+                        setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+                    }
                 }
             });
         });
@@ -1423,13 +1429,10 @@
             });
         });
 
-        // Mobile optimizations
-        document.addEventListener('touchstart', function() {}, { passive: true });
-        document.addEventListener('touchend', function(e) {
-            if (e.target.classList.contains('option-btn') || e.target.classList.contains('guess-btn')) {
-                e.preventDefault();
-            }
-        }, { passive: true });
+        // Mobile: prevent double-tap zoom on interactive elements
+        document.querySelectorAll('.guess-btn, .option-btn, .german-word').forEach(el => {
+            el.addEventListener('touchend', e => { e.preventDefault(); el.click(); });
+        });
     </script>
 </body>
 </html>
