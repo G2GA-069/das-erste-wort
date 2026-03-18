@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Das erste Wort — A Language Journey</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0e1a;
+    color: #d4cabb;
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    font-size: 18px;
+    line-height: 1.8;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .container {
+    max-width: 520px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: #efe8db;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.2em;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+    font-style: italic;
+    color: #e8a44a;
+    margin-bottom: 2.5em;
+  }
+
+  .chapters {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  a.chapter-link {
+    display: block;
+    background: linear-gradient(135deg, rgba(20, 28, 45, 0.9), rgba(12, 16, 28, 0.9));
+    border: 1px solid rgba(232, 164, 74, 0.15);
+    border-radius: 12px;
+    padding: 24px 28px;
+    text-decoration: none;
+    color: #d4cabb;
+    transition: all 0.3s ease;
+    text-align: left;
+  }
+
+  a.chapter-link:hover, a.chapter-link:active {
+    border-color: rgba(232, 164, 74, 0.4);
+    background: linear-gradient(135deg, rgba(26, 35, 55, 0.95), rgba(15, 20, 35, 0.95));
+    transform: translateY(-2px);
+  }
+
+  .chapter-link .ch-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: rgba(212, 202, 187, 0.4);
+  }
+
+  .chapter-link .ch-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #e8a44a;
+    margin: 4px 0 6px;
+  }
+
+  .chapter-link .ch-desc {
+    font-size: 0.95rem;
+    color: rgba(212, 202, 187, 0.6);
+    line-height: 1.5;
+  }
+
+  .footer {
+    margin-top: 3em;
+    font-size: 0.85rem;
+    color: rgba(212, 202, 187, 0.25);
+  }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 2.2rem; }
+    a.chapter-link { padding: 20px 22px; }
+    .chapter-link .ch-title { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Das erste Wort</h1>
+    <div class="subtitle">A language journey through time</div>
+
+    <div class="chapters">
+      <a href="chapter1.html" class="chapter-link">
+        <div class="ch-label">Chapter One</div>
+        <div class="ch-title">Das erste Wort</div>
+        <div class="ch-desc">The First Word — On the steppe, around a fire, where every language began.</div>
+      </a>
+
+      <a href="chapter2.html" class="chapter-link">
+        <div class="ch-label">Chapter Two</div>
+        <div class="ch-title">Die Waldsprache</div>
+        <div class="ch-desc">The Forest Tongue — In the Germanic forests, where English and German were still one language.</div>
+      </a>
+    </div>
+
+    <div class="footer">For Veronica</div>
+  </div>
+</body>
+</html>
