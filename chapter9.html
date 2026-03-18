@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<title>The First Word — Chapter 9</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --fire: #e8a44a;
+    --fire-glow: #f4c67a;
+    --ember: #c45d2c;
+    --ash: #5a5552;
+    --ash-light: #8b8885;
+    --night: #0a0e1a;
+    --night-mid: #131a2e;
+    --night-light: #1c2640;
+    --star: #e8dcc8;
+    --text: #d4cabb;
+    --text-bright: #efe8db;
+    --german: #e8a44a;
+    --chinese: #c49a6c;
+    --english: #8a9bae;
+    --pie: #9b8ec4;
+    --steppe: #2a1f14;
+    --muted-blue: #4a5a7a;
+    --cold-white: #d8d4c8;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: #1a1815;
+  }
+
+  body {
+    background: #1a1815;
+    color: #d4cabb;
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    font-size: 1.25rem;
+    line-height: 1.85;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* --- ASH PARTICLE CANVAS --- */
+  #ashfield {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* --- MAIN CONTENT --- */
+  .content {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 120px;
+  }
+
+  /* --- TITLE SCREEN --- */
+  .title-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .title-screen h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--text-bright);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.3em;
+    opacity: 0;
+    animation: fadeUp 2s ease 0.5s forwards;
+  }
+
+  .title-screen .subtitle {
+    font-size: 1.3rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--ash-light);
+    opacity: 0;
+    animation: fadeUp 2s ease 1.2s forwards;
+    margin-bottom: 2em;
+  }
+
+  .title-screen .chapter-label {
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(212, 202, 187, 0.4);
+    opacity: 0;
+    animation: fadeUp 2s ease 0.2s forwards;
+    margin-bottom: 0.5em;
+  }
+
+  .scroll-hint {
+    opacity: 0;
+    animation: fadeUp 2s ease 2s forwards;
+    color: rgba(212, 202, 187, 0.3);
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    margin-top: 3em;
+  }
+
+  .scroll-hint span {
+    display: inline-block;
+    animation: bob 2s ease-in-out infinite;
+  }
+
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- SCENES --- */
+  .scene {
+    margin-bottom: 80px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .scene.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scene-marker {
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--ash-light), transparent);
+    margin: 0 auto 40px;
+  }
+
+  /* --- NARRATIVE TEXT --- */
+  .narrative {
+    font-size: 1.25rem;
+    line-height: 1.9;
+    margin-bottom: 1.5em;
+    color: var(--text);
+  }
+
+  .narrative.emphasis {
+    font-size: 1.35rem;
+    color: var(--text-bright);
+    text-align: center;
+    font-style: italic;
+    margin: 2em 0;
+  }
+
+  .narrative.small {
+    font-size: 1.05rem;
+    color: rgba(212, 202, 187, 0.6);
+    line-height: 1.7;
+  }
+
+  /* --- GERMAN WORDS --- */
+  .german-word {
+    color: var(--german);
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 1px dotted rgba(232, 164, 74, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .german-word:hover {
+    color: var(--fire-glow);
+    border-bottom-color: var(--fire-glow);
+  }
+
+  .german-word.revealed {
+    border-bottom-color: transparent;
+  }
+
+  /* --- ETYMOLOGY CARDS --- */
+  .ety-card {
+    background: linear-gradient(135deg, rgba(26, 35, 55, 0.95), rgba(15, 20, 35, 0.95));
+    border: 1px solid rgba(232, 164, 74, 0.15);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 24px 0 32px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.6s ease, opacity 0.5s ease, padding 0.5s ease, margin 0.5s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(232, 164, 74, 0.08);
+  }
+
+  .ety-card.open {
+    max-height: 800px;
+    opacity: 1;
+    padding: 28px 32px;
+    margin: 24px 0 32px;
+  }
+
+  .ety-card .word-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .ety-card .word-main {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--german);
+  }
+
+  .ety-card .word-pron {
+    font-size: 1rem;
+    color: rgba(212, 202, 187, 0.5);
+    font-style: italic;
+  }
+
+  .ety-card .word-meaning {
+    font-size: 1.1rem;
+    color: var(--text-bright);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(232, 164, 74, 0.1);
+  }
+
+  .ety-card .bridge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0;
+    font-size: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .bridge-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Noto Serif', serif;
+    min-width: 55px;
+    text-align: center;
+  }
+
+  .bridge-label.pie { background: rgba(155, 142, 196, 0.15); color: var(--pie); }
+  .bridge-label.eng { background: rgba(138, 155, 174, 0.15); color: var(--english); }
+  .bridge-label.deu { background: rgba(232, 164, 74, 0.15); color: var(--german); }
+  .bridge-label.zho { background: rgba(196, 154, 108, 0.15); color: var(--chinese); }
+
+  .bridge-word {
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--text-bright);
+  }
+
+  .bridge-word.zh {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .bridge-note {
+    font-size: 0.9rem;
+    color: rgba(212, 202, 187, 0.5);
+    font-style: italic;
+  }
+
+  .ety-card .story {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(232, 164, 74, 0.1);
+    font-size: 1rem;
+    color: rgba(212, 202, 187, 0.75);
+    line-height: 1.7;
+  }
+
+  /* --- CHINESE CHARACTER DISPLAY --- */
+  .char-display {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(196, 154, 108, 0.08);
+    border: 1px solid rgba(196, 154, 108, 0.15);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 4px 8px;
+    vertical-align: middle;
+  }
+
+  .char-display .char {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 2.2rem;
+    color: var(--chinese);
+    line-height: 1.2;
+  }
+
+  .char-display .pinyin {
+    font-size: 0.8rem;
+    color: rgba(196, 154, 108, 0.7);
+    margin-top: 2px;
+  }
+
+  /* --- INTERACTIVE GUESS SECTIONS --- */
+  .guess-section {
+    background: linear-gradient(135deg, rgba(20, 28, 45, 0.9), rgba(12, 16, 28, 0.9));
+    border: 1px solid rgba(232, 164, 74, 0.12);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 40px 0;
+    text-align: center;
+  }
+
+  .guess-section .prompt {
+    font-size: 1.15rem;
+    color: var(--text-bright);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .guess-options {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .guess-btn {
+    background: rgba(232, 164, 74, 0.08);
+    border: 1px solid rgba(232, 164, 74, 0.25);
+    color: var(--text-bright);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .guess-btn:hover {
+    background: rgba(232, 164, 74, 0.15);
+    border-color: var(--fire);
+    transform: translateY(-2px);
+  }
+
+  .guess-btn.correct {
+    background: rgba(74, 180, 100, 0.15);
+    border-color: #4ab464;
+    color: #8ed69e;
+    pointer-events: none;
+  }
+
+  .guess-btn.incorrect {
+    background: rgba(180, 74, 74, 0.1);
+    border-color: rgba(180, 74, 74, 0.3);
+    color: rgba(212, 202, 187, 0.3);
+    pointer-events: none;
+  }
+
+  .guess-feedback {
+    font-size: 1rem;
+    margin-top: 12px;
+    min-height: 1.5em;
+    color: var(--ash-light);
+    font-style: italic;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .guess-feedback.show { opacity: 1; }
+
+  /* --- SECTION DIVIDERS --- */
+  .divider {
+    text-align: center;
+    margin: 60px 0;
+    color: rgba(232, 164, 74, 0.2);
+    font-size: 1.5rem;
+    letter-spacing: 0.5em;
+  }
+
+  /* --- PATTERNS BOX --- */
+  .aside-box {
+    background: rgba(155, 142, 196, 0.06);
+    border-left: 2px solid rgba(155, 142, 196, 0.3);
+    padding: 20px 24px;
+    margin: 28px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(212, 202, 187, 0.8);
+  }
+
+  .aside-box .aside-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--pie);
+    margin-bottom: 8px;
+  }
+
+  /* --- WORD COLLECTION --- */
+  .word-collection {
+    background: linear-gradient(135deg, rgba(20, 28, 45, 0.95), rgba(10, 14, 26, 0.95));
+    border: 1px solid rgba(232, 164, 74, 0.12);
+    border-radius: 16px;
+    padding: 40px 32px;
+    margin: 60px 0;
+    text-align: center;
+  }
+
+  .word-collection h3 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: rgba(232, 164, 74, 0.5);
+    margin-bottom: 24px;
+  }
+
+  .collected-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .collected-word {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(232, 164, 74, 0.06);
+    border: 1px solid rgba(232, 164, 74, 0.15);
+    border-radius: 10px;
+    padding: 14px 20px;
+    min-width: 90px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .collected-word.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .collected-word .cw-german {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--german);
+  }
+
+  .collected-word .cw-english {
+    font-size: 0.8rem;
+    color: rgba(212, 202, 187, 0.4);
+    margin-top: 2px;
+  }
+
+  /* --- CHAPTER END --- */
+  .chapter-end {
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  .chapter-end .end-line {
+    width: 60px;
+    height: 1px;
+    background: var(--ash-light);
+    margin: 0 auto 30px;
+    opacity: 0.4;
+  }
+
+  .chapter-end .next-chapter {
+    font-size: 1rem;
+    color: rgba(212, 202, 187, 0.4);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 40px;
+  }
+
+  /* --- PROGRESS BAR --- */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(90, 85, 82, 0.8), rgba(139, 136, 133, 0.8), rgba(158, 153, 148, 0.8));
+    z-index: 100;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+
+  /* Force readable size on all mobile */
+  @media (max-width: 768px) {
+    html { font-size: 16px !important; }
+    body { font-size: 18px !important; min-width: 0 !important; width: 100% !important; }
+    .content { max-width: 100% !important; width: 100% !important; }
+  }
+
+  /* --- RESPONSIVE / MOBILE --- */
+  @media (max-width: 600px) {
+    body { font-size: 18px !important; -webkit-text-size-adjust: 100%; }
+    .content { padding: 40px 16px 100px; }
+    .title-screen { min-height: 90vh; min-height: 90dvh; padding: 30px 16px; }
+    .title-screen h1 { font-size: 2.2rem; letter-spacing: 0.04em; }
+    .title-screen .subtitle { font-size: 1.15rem; }
+    .narrative { font-size: 1.1rem; line-height: 1.8; }
+    .narrative.emphasis { font-size: 1.2rem; }
+
+    .ety-card { padding: 20px 16px; border-radius: 10px; }
+    .ety-card .word-main { font-size: 1.6rem; }
+    .ety-card .bridge { gap: 8px; }
+    .bridge-label { font-size: 0.7rem; min-width: 45px; padding: 2px 6px; }
+    .bridge-word { font-size: 1.05rem; }
+    .bridge-note { font-size: 0.82rem; }
+    .ety-card .story { font-size: 0.95rem; }
+
+    .german-word { padding: 2px 0; }
+
+    .char-display { padding: 10px 16px; margin: 4px 4px; }
+    .char-display .char { font-size: 1.8rem; }
+
+    .guess-section { padding: 24px 16px; border-radius: 10px; }
+    .guess-options { gap: 10px; }
+    .guess-btn {
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .guess-feedback { font-size: 0.95rem; }
+
+    .aside-box { padding: 16px 18px; font-size: 0.98rem; }
+
+    .word-collection { padding: 28px 16px; }
+    .collected-words { gap: 8px; }
+    .collected-word { padding: 10px 14px; min-width: 80px; }
+    .collected-word .cw-german { font-size: 1.1rem; }
+
+    .scene { margin-bottom: 60px; }
+    .divider { margin: 40px 0; }
+    .scene-marker { height: 30px; margin-bottom: 30px; }
+  }
+
+  @media (max-width: 380px) {
+    .title-screen h1 { font-size: 1.9rem; }
+    .narrative { font-size: 1.05rem; }
+    .ety-card .word-main { font-size: 1.4rem; }
+    .guess-btn { padding: 12px 16px; font-size: 1.05rem; }
+    .collected-word { min-width: 70px; padding: 8px 10px; }
+  }
+
+  /* iOS safe areas */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    .content { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="ashfield"></canvas>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="content">
+
+  <!-- ==================== TITLE ==================== -->
+  <div class="title-screen">
+    <div class="chapter-label">Chapter Nine</div>
+    <h1>Die Stille danach</h1>
+    <div class="subtitle">The Silence After</div>
+    <div class="scroll-hint"><span>↓</span></div>
+  </div>
+
+  <!-- ==================== SCENE 1: THE RUINS ==================== -->
+  <div class="scene" id="scene1">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      May 1945. Berlin is ash. The city's heart has been burned out, block by block, leaving rubble that rises like teeth from a wound. And in the silence that follows destruction — when the bombs stop falling and the guns stop firing — something strange happens to language.
+    </p>
+
+    <p class="narrative">
+      The words are still there. Mutter. Feuer. Wasser. All eight hundred thousand words of the German language, intact in the dictionary. But the speakers have changed. The listeners have changed. The meaning has changed.
+    </p>
+
+    <p class="narrative">
+      A mother looks at her child in the rubble. What can she say? Every word she was taught has been poisoned. Every phrase that once meant something innocent has been twisted into an instrument of cruelty. The language didn't break. But its speakers did.
+    </p>
+
+    <p class="narrative">
+      This is the story of what happens to words when they are weaponized. And what happens to people who must speak them again.
+    </p>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 2: SCHULD ==================== -->
+  <div class="scene" id="scene2">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      In the ruins, a woman sits alone. She was seventeen when the war began. Now, twelve years later, she is a stranger to herself. In her hands is a German grammar book — the same book her children had been learning from before the schools burned. She stares at a single word:
+    </p>
+
+    <p class="narrative emphasis">
+      <span class="german-word" data-card="schuld">Schuld.</span>
+    </p>
+
+    <p class="narrative">
+      Guilt. But also: debt. In German, the same word means both — a deliberate ambiguity written into the language itself, as if the speakers knew that guilt is a kind of debt you can never repay.
+    </p>
+
+    <p class="narrative">
+      She carries both meanings now. The guilt of survival. The guilt of having believed. The guilt of having been silent when silence was complicity. And the debt — to the six million who were murdered, to the thirty million who died in the war, to her own conscience, to history itself.
+    </p>
+
+    <p class="narrative">
+      How do you speak your mother tongue when your mother tongue has been used as a weapon? When the language of Goethe and Schiller has been twisted into the language of propaganda and dehumanization?
+    </p>
+
+    <!-- SCHULD etymology card -->
+    <div class="ety-card" id="card-schuld">
+      <div class="word-header">
+        <span class="word-main">Schuld</span>
+        <span class="word-pron">/ʃʊlt/</span>
+      </div>
+      <div class="word-meaning">guilt, or debt — the language itself refuses to distinguish between personal wrong and unpayable obligation</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Schuld</span>
+        <span class="bridge-note">— from Old High German "sculda," related to "Schuldnis" (debt)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">should</span>
+        <span class="bridge-note">— modern English "should" comes from "shall" + past tense: "was supposed to"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">债 / 罪</span>
+        <span class="bridge-note">— zhài (debt) / zuì (guilt) — Chinese keeps them separate, distinct moral categories</span>
+      </div>
+      <div class="story">
+        In 1946, the German philosopher Karl Jaspers wrote about "collective guilt" — <em>Kollektivschuld</em> — an argument that haunted postwar Germany. Was the entire nation <em>Schuldig</em> (guilty)? Did everyone who spoke German share the debt? This is why the language matters. German itself, by collapsing "guilt" and "debt" into one word, forces a terrible honesty: you cannot separate what you did from what you owe. Chinese, with its visual precision, keeps the categories distinct: 债 (debt, external) and 罪 (guilt, moral interior). German demands integration. You must hold both meanings at once.
+      </div>
+    </div>
+
+    <p class="narrative">
+      For a generation of German speakers, speaking their own language became an act of penitence.
+    </p>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 3: KRIEG AND FRIEDEN ==================== -->
+  <div class="scene" id="scene3">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      There is a word that an older German speaker knows from her grandfather's war — the First World War, 1914-1918. The word is <span class="german-word" data-card="krieg">Krieg.</span> War. Her grandfather used to say he was going to <em>Krieg</em>, and he came home with the word forever embedded in his nightmares.
+    </p>
+
+    <p class="narrative">
+      But now there is a new war, and this one has no name that is honest. Germans spoke of <em>der totale Krieg</em> — total war. And in that totality, something unprecedented occurred: the language itself became a weapon. Words were twisted. Terms were invented. <em>Endlösung</em> — "final solution" — became a euphemism for genocide. <em>Umsiedlung</em> — "resettlement" — hid mass murder.
+    </p>
+
+    <p class="narrative">
+      The opposite of Krieg is <span class="german-word" data-card="frieden">Frieden.</span> Peace. But after 1945, many German speakers could not speak the word Frieden because they had not earned it. Peace requires innocence, and innocence was lost.
+    </p>
+
+    <!-- KRIEG etymology card -->
+    <div class="ety-card" id="card-krieg">
+      <div class="word-header">
+        <span class="word-main">Krieg</span>
+        <span class="word-pron">/kʁiːk/</span>
+      </div>
+      <div class="word-meaning">war — from an ancient root meaning struggle and conflict</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*kreue-</span>
+        <span class="bridge-note">— root meaning "to strike, to harm"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">cry</span>
+        <span class="bridge-note">— related root: the cry of battle, the outcry of suffering</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">战争</span>
+        <span class="bridge-note">— zhàn zhēng — to fight + to compete: war as the ultimate competition</span>
+      </div>
+      <div class="story">
+        The word "cry" in English and "Krieg" in German come from the same ancient root: the sound of struggle. In Old English, "cry" could mean a shout, a command, or a call to arms. German kept the sense of violence and conflict in the word. But notice the word "cry" has softened in modern English — now it usually means tears, sadness, a call for help. German kept the harder meaning intact. This difference in how words shift reveals something about how each culture processed the concept: English romanticized warfare into emotion; German never let go of its essential violence.
+      </div>
+    </div>
+
+    <!-- FRIEDEN etymology card -->
+    <div class="ety-card" id="card-frieden">
+      <div class="word-header">
+        <span class="word-main">Frieden</span>
+        <span class="word-pron">/ˈfʁiːdn̩/</span>
+      </div>
+      <div class="word-meaning">peace — originally meaning safety, protection, sanctuary</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Frieden</span>
+        <span class="bridge-note">— from Old High German "fridu," meaning protection and safety</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">free</span>
+        <span class="bridge-note">— related root: to be free means to be under no threat, safe from danger</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">和平</span>
+        <span class="bridge-note">— hé píng — harmony + level/flat: peace as balance and equilibrium</span>
+      </div>
+      <div class="story">
+        "Frieden" is older than "Krieg" in Germanic languages — it means not the absence of war, but the presence of safety. To have <em>Frieden</em> is to dwell under protection, to be able to sleep without fear. This is why after 1945, the word felt impossible to German speakers. They were not safe — not from punishment, not from memory, not from their own conscience. To speak "Frieden" would be a lie. Many waited decades before they could utter the word again without shame.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== INTERACTIVE GUESS 1 ==================== -->
+  <div class="scene" id="scene-guess1">
+    <div class="guess-section">
+      <div class="prompt">
+        After the war, German speakers often used the word <strong style="color: var(--german);">Wiederaufbau</strong> — rebuilding. You know "wieder" means "again," and "aufbau" relates to the verb "aufbauen" (to build up).<br><br>
+        What do you think this word means in the context of 1946?
+      </div>
+      <div class="guess-options">
+        <button class="guess-btn" onclick="guess(this, true)">rebuilding / reconstruction</button>
+        <button class="guess-btn" onclick="guess(this, false)">returning to the past</button>
+        <button class="guess-btn" onclick="guess(this, false)">escaping war</button>
+      </div>
+      <div class="guess-feedback" id="feedback1"></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 4: MAUER & WALL ==================== -->
+  <div class="scene" id="scene4">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      You have learned this word before. <span class="german-word" data-card="mauer">Mauer.</span> Wall. In Chapter Three, we watched the Romans build their walls — permanence, boundary, defense. The same word survives into the twentieth century. But now it divides a city. Now it divides a nation.
+    </p>
+
+    <p class="narrative">
+      On August 13, 1961, overnight, the Berlin Wall went up. <em>Die Berliner Mauer.</em> Ten thousand soldiers and police, barbed wire, concrete blocks — a line that separated East from West, families from families, words from the people who spoke them. Germans on one side could no longer hear how Germans on the other side pronounced the same language.
+    </p>
+
+    <p class="narrative">
+      The Mauer was the physical manifestation of something that had already happened in the language: fracture. The language had split. East German and West German began to diverge — different words for the same things, different meanings for the same words, different futures for people who once spoke as one.
+    </p>
+
+    <p class="narrative">
+      But walls can come down. And when they do, the language reunites — scarred, changed, but whole again.
+    </p>
+
+    <!-- MAUER etymology card -->
+    <div class="ety-card" id="card-mauer">
+      <div class="word-header">
+        <span class="word-main">Mauer</span>
+        <span class="word-pron">/ˈmaʊɐ/</span>
+      </div>
+      <div class="word-meaning">wall — a barrier that divides as much as it protects</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*meh₂-</span>
+        <span class="bridge-note">— root meaning "to build, to construct"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">make</span>
+        <span class="bridge-note">— to make something is to build it; all construction language shares this root</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">墙 / 城墙</span>
+        <span class="bridge-note">— qiáng / chéng qiáng — wall / city wall — China's own walls are ancient and revered</span>
+      </div>
+      <div class="story">
+        When the Berlin Wall fell on November 9, 1989, people did not just speak German reunification — they lived it. East and West Germans could hear each other's voices again. But they had forgotten how. After 28 years of separation, the language had changed on both sides. East Germans had Russian influence; West Germans had English. They spoke the same language, but they did not always understand each other. The <em>Mauer</em> had separated more than a city. It had separated a language from itself. And when the wall came down, Germans had to learn their own language again, as if meeting an estranged sibling.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 5: SCHWEIGEN ==================== -->
+  <div class="scene" id="scene5">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      There is a word that applies to an entire generation: <span class="german-word" data-card="schweigen">Schweigen.</span> To be silent. To keep silent.
+    </p>
+
+    <p class="narrative">
+      After 1945, German families did not talk about what had happened. Parents did not explain to their children. Children did not ask. There was a silence so profound that it shaped the entire postwar generation — a silence that was not peace, but paralysis.
+    </p>
+
+    <p class="narrative">
+      <em>Das Schuld</em> — The guilt. <em>Die Schuld</em> — The debt. <em>Schweigen.</em> Silence.
+    </p>
+
+    <p class="narrative">
+      It would take decades before Germans could speak openly about this period. The younger generation had to demand it. They had to ask their parents: What did you do? What did you know? Why didn't you say anything? Only then, slowly, did the silence break. Only then did the language begin to heal.
+    </p>
+
+    <!-- SCHWEIGEN etymology card -->
+    <div class="ety-card" id="card-schweigen">
+      <div class="word-header">
+        <span class="word-main">Schweigen</span>
+        <span class="word-pron">/ˈʃvaɪɡn̩/</span>
+      </div>
+      <div class="word-meaning">to be silent, to keep quiet — an active choice, not mere absence of sound</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Schweigen</span>
+        <span class="bridge-note">— from Old High German "swīgen," related to "swore" (sword) — the silence of one who has been struck mute</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">swear</span>
+        <span class="bridge-note">— to swear an oath of silence; both words relate to binding oneself to something</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">沉默</span>
+        <span class="bridge-note">— chénmò — to sink + to be silent: silence as a weight that pulls you down</span>
+      </div>
+      <div class="story">
+        German "Schweigen" is active. It is not just the absence of speech — it is the choice to hold your tongue. In postwar Germany, <em>Schweigen</em> was not innocent. It was complicity. It was shame. It was guilt. This is why, when Germans finally began to speak in the 1960s, the act of breaking silence was revolutionary. They had to learn that sometimes, the opposite of guilt is not innocence — it is honesty.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 6: ERINNERUNG ==================== -->
+  <div class="scene" id="scene6">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      But there is another word that matters: <span class="german-word" data-card="erinnerung">Erinnerung.</span> Memory. Or, more precisely, remembrance — the act of bringing something back inside yourself.
+    </p>
+
+    <p class="narrative">
+      The word "Erinnerung" contains within it the verb "innen" — literally meaning "inner" or "inside." To remember, in German, is to make something internal. To gather the scattered pieces of the past and hold them inside yourself, not as a burden you can set down, but as part of who you are.
+    </p>
+
+    <p class="narrative">
+      After silence comes memory. And memory, for Germans, meant confronting what happened. It meant looking at the past not with nostalgia, not with denial, but with <em>Erinnerung</em> — bringing the horror inside, making it part of your identity, so that it can never happen again.
+    </p>
+
+    <p class="narrative">
+      This is the work of language: to hold what cannot be forgotten. To speak what was silenced.
+    </p>
+
+    <!-- ERINNERUNG etymology card -->
+    <div class="ety-card" id="card-erinnerung">
+      <div class="word-header">
+        <span class="word-main">Erinnerung</span>
+        <span class="word-pron">/ɛɐ̯ˈɪnərʊŋ/</span>
+      </div>
+      <div class="word-meaning">memory, remembrance — literally "making something inner," internalizing the past</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Erinnerung</span>
+        <span class="bridge-note">— from "erinnern" (to remember) + "-ung" (act of); contains "innen" (inside)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">remember</span>
+        <span class="bridge-note">— from Latin "re-" (again) + "membrum" (limb) — to put the limbs back together, to reassemble</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">记忆</span>
+        <span class="bridge-note">— jìyì — to record (jì) + to recall (yì) — memory as both inscription and retrieval</span>
+      </div>
+      <div class="story">
+        "Erinnerung" is perhaps the most psychologically acute word in German. It doesn't just mean "recalling" — it means making something part of your inner self. To "remember" in English is more external: you retrieve a fact. To "erinnern" in German is to internalize, to own, to integrate. This is why Germany's approach to historical memory is so different from other nations. Germans speak of <em>Erinnerungskultur</em> — "culture of remembrance" — a national commitment to making the Nazi past an internal part of the national identity, something that shapes who Germans are, not something they can simply file away and move past.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 7: VERANTWORTUNG ==================== -->
+  <div class="scene" id="scene7">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      From silence and memory emerges a third word: <span class="german-word" data-card="verantwortung">Verantwortung.</span> Responsibility. But look at the word carefully — inside it lives another word: <em>Antwort.</em> Answer.
+    </p>
+
+    <p class="narrative">
+      To have Verantwortung is to be in a state of having to answer. To be responsible means to have an account to give — to history, to the victims, to yourself. It is not a virtue you possess. It is a debt you carry. It is a question you must always be prepared to answer.
+    </p>
+
+    <p class="narrative">
+      The postwar German commitment was to never again deny this responsibility. To always answer for the past. To teach the next generation what happened. To build institutions — memorials, museums, curricula — around this principle: we must answer.
+    </p>
+
+    <!-- VERANTWORTUNG etymology card -->
+    <div class="ety-card" id="card-verantwortung">
+      <div class="word-header">
+        <span class="word-main">Verantwortung</span>
+        <span class="word-pron">/ˌfɛɐ̯ˈantvɔʁtʊŋ/</span>
+      </div>
+      <div class="word-meaning">responsibility — literally "state of having to answer" (Antwort = answer)</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Verantwortung</span>
+        <span class="bridge-note">— "vor" (before) + "Antwort" (answer) — to stand before and answer</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">responsible</span>
+        <span class="bridge-note">— from Latin "respondere" (to answer back, to correspond) — a debt or obligation you must answer for</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">责任</span>
+        <span class="bridge-note">— zérèn — duty/blame (zé) + assignment/role (rèn) — responsibility as an assigned burden</span>
+      </div>
+      <div class="story">
+        The German word "Verantwortung" is unique in carrying the explicit meaning of "having to answer." This is why it became the philosophical center of postwar German ethics. The theologian and philosopher Paul Tillich, writing in exile, spoke of responsibility as "answerability before God." In German, this is literally baked into the word structure. You cannot say "I am responsible" in German without implying "I have an answer to give." This linguistic feature shaped an entire culture of accountability that became unique to postwar Germany.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 8: HOFFNUNG REVISITED ==================== -->
+  <div class="scene" id="scene8">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      You encountered this word in Chapter Five: <span class="german-word" data-card="hoffnung">Hoffnung.</span> Hope. But now, in the context of postwar Germany, the word has been reborn with a different meaning.
+    </p>
+
+    <p class="narrative">
+      In 1945, hope was not naive optimism. It was not a return to innocence. It was something harder — the deliberate choice to believe that language, culture, and humanity could survive catastrophe. That from the ashes, something could be rebuilt. Not the same. Never the same. But something new.
+    </p>
+
+    <p class="narrative">
+      German children born after 1945 inherited a language that had been poisoned and purified simultaneously. The words were the same, but the speakers had been transformed. They bore witness to the guilt their parents carried. And they chose, slowly, to speak the language differently — to reclaim it, to repair it, to make it something worthy of speaking again.
+    </p>
+
+    <!-- HOFFNUNG etymology card -->
+    <div class="ety-card" id="card-hoffnung">
+      <div class="word-header">
+        <span class="word-main">Hoffnung</span>
+        <span class="word-pron">/ˈhɔfnʊŋ/</span>
+      </div>
+      <div class="word-meaning">hope — not optimism, but the determination to believe in a future despite everything</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Hoffnung</span>
+        <span class="bridge-note">— from "hoffen" (to hope), related to "heben" (to lift): hope that lifts you up</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">hope</span>
+        <span class="bridge-note">— Old English "hopian," possibly related to "hop" — the small, light movements that lift you forward</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">希望</span>
+        <span class="bridge-note">— xīwàng — rare/sparse (xī) + to gaze at/to desire (wàng) — hope as looking toward what is rare</span>
+      </div>
+      <div class="story">
+        In postwar Germany, <em>Hoffnung</em> was not sentiment. It was survival mechanism. The German writer Theodor Adorno famously wrote, "After Auschwitz, to write a poem is barbaric." And yet, people continued to write. They continued to speak. They continued to hope. The word "Hoffnung" became sacred — not because it was easy, but because it was nearly impossible. Every act of hope was an act of defiance against nihilism.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== INTERACTIVE GUESS 2 ==================== -->
+  <div class="scene" id="scene-guess2">
+    <div class="guess-section">
+      <div class="prompt">
+        In postwar German, a powerful word emerged: <strong style="color: var(--german);">Aufarbeitung der Vergangenheit</strong> — the "working through" or "working up" of the past. The core word is "aufarbeiten" — to work up.<br><br>
+        What does the prefix "auf-" (same as in "aufbauen" = to build) suggest about this process?
+      </div>
+      <div class="guess-options">
+        <button class="guess-btn" onclick="guess(this, false)">erasing the past</button>
+        <button class="guess-btn" onclick="guess(this, true)">building something up from the past / processing and transforming it</button>
+        <button class="guess-btn" onclick="guess(this, false)">moving forward without looking back</button>
+      </div>
+      <div class="guess-feedback" id="feedback2"></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCENE 9: ZUSAMMEN & WIEDERVEREINIGUNG ==================== -->
+  <div class="scene" id="scene9">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      The German language has a gift for prefixes that allow it to express the act of rebuilding. One of the most important is <span class="german-word" data-card="zusammen">zusammen.</span> Together. It contains within it "samen" (seeds), as if together means to gather the seeds and plant them again.
+    </p>
+
+    <p class="narrative">
+      After 1945, German words about rebuilding all used this prefix: <em>zusammenarbeiten</em> (to work together), <em>zusammenkommen</em> (to come together), <em>zusammenleben</em> (to live together). The language itself was structured to express the possibility of unity.
+    </p>
+
+    <p class="narrative">
+      And on November 9, 1989, the ultimate word: <span class="german-word" data-card="wiedervereinigung">Wiedervereinigung.</span> Reunification. The wall fell. The language that had been split for twenty-eight years came together again.
+    </p>
+
+    <p class="narrative">
+      But it was not a simple reunion. East and West had drifted so far apart that they had to learn to speak each other's language. The dialects had changed. The vocabulary had shifted. They were German speakers, but they had to listen to understand.
+    </p>
+
+    <p class="narrative">
+      And yet, they could still understand. The core language — <em>Mutter, Feuer, Wasser</em> — was the same. The ancient words that connect all German speakers across centuries still held. The language survived division. And division could not destroy the language.
+    </p>
+
+    <!-- ZUSAMMEN etymology card -->
+    <div class="ety-card" id="card-zusammen">
+      <div class="word-header">
+        <span class="word-main">Zusammen</span>
+        <span class="word-pron">/tsuˈzamən/</span>
+      </div>
+      <div class="word-meaning">together — literally "to gather seeds," the act of bringing fragments into unity</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Zusammen</span>
+        <span class="bridge-note">— from "zu" (to) + "sammen" (seeds, gather) — the fundamental prefix of rebuilding</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">assemble</span>
+        <span class="bridge-note">— from Latin "ad" (to) + "semblare" (to gather) — similar concept, different root</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">一起 / 在一起</span>
+        <span class="bridge-note">— yīqǐ / zài yī qǐ — at one place, together — spatial togetherness</span>
+      </div>
+      <div class="story">
+        German "zusammen" is not just spatial — it is generative. When you put seeds together (zusammen), they can grow. German uses this prefix for every act of rebuilding and coming together. "Zusammenleben" (living together) suggests more than cohabitation — it suggests the possibility of growth, of new life, of integration. This is why, when the Berlin Wall fell, the word "Wiedervereinigung" was not just political — it was linguistic. The language itself was being healed.
+      </div>
+    </div>
+
+    <!-- WIEDERVEREINIGUNG etymology card -->
+    <div class="ety-card" id="card-wiedervereinigung">
+      <div class="word-header">
+        <span class="word-main">Wiedervereinigung</span>
+        <span class="word-pron">/ˌviːdɐfɛɐ̯ˈaɪnɪɡʊŋ/</span>
+      </div>
+      <div class="word-meaning">reunification — a return, but also a re-creation of unity</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Wiedervereinigung</span>
+        <span class="bridge-note">— "wieder" (again) + "Vereinigung" (unification) — November 9, 1989, when the wall fell</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">reunification</span>
+        <span class="bridge-note">— "re-" (again) + "unification" — to unite again, but not return to the same state</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">重新统一</span>
+        <span class="bridge-note">— chóngxīn tǒngyī — once again + unified — similar meaning, emphasizing the "once again" aspect</span>
+      </div>
+      <div class="story">
+        The fall of the Berlin Wall was not a simple "return" to prewar Germany. It was a transformation. East and West Germany did not become one nation by erasing the past — they became one nation by honoring the differences created by that past. The word "Wiedervereinigung" contains this paradox: "wieder" means "again," suggesting return, but the reality was something new. Germany after reunification was different from Germany before division, and it remained aware of this difference. The language of reunification was the language of healing — not forgetting.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 10: LANGUAGE SURVIVES ==================== -->
+  <div class="scene" id="scene10">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      This is what happens to language when it is corrupted. It does not break. It becomes scarred. It becomes haunted. But it survives. And those who speak it must face what happened in its name.
+    </p>
+
+    <p class="narrative">
+      The German language is not guilty. Words are not guilty. But the speakers of a language bear responsibility for what that language has been made to express. And this is why postwar Germany developed such an acute consciousness of language. Every word became a site of reckoning.
+    </p>
+
+    <p class="narrative">
+      Veronica, you are learning German in 2026. You are learning the language that was twisted into propaganda. You are learning the language of Goethe and Schiller, yes — but you are also learning the language of Auschwitz, of the Mauer, of Schweigen. You are learning the language that had to rebuild itself after catastrophe.
+    </p>
+
+    <p class="narrative">
+      And perhaps that is why this language matters. Because it teaches you something essential about all languages, all words, all human speech: they can be corrupted. They must be guarded. They must be spoken with consciousness of what they have meant, what they have been made to mean, and what they can mean again.
+    </p>
+
+    <p class="narrative emphasis">
+      The words remember. And we must remember with them.
+    </p>
+  </div>
+
+  <!-- ==================== WORD COLLECTION ==================== -->
+  <div class="scene" id="scene-collection">
+    <div class="word-collection">
+      <h3>Words Gathered in Chapter Nine</h3>
+      <div class="collected-words">
+        <div class="collected-word" data-delay="0"><span class="cw-german">Schuld</span><span class="cw-english">guilt / debt</span></div>
+        <div class="collected-word" data-delay="100"><span class="cw-german">Krieg</span><span class="cw-english">war</span></div>
+        <div class="collected-word" data-delay="200"><span class="cw-german">Frieden</span><span class="cw-english">peace</span></div>
+        <div class="collected-word" data-delay="300"><span class="cw-german">Mauer</span><span class="cw-english">wall</span></div>
+        <div class="collected-word" data-delay="400"><span class="cw-german">Schweigen</span><span class="cw-english">silence</span></div>
+        <div class="collected-word" data-delay="500"><span class="cw-german">Erinnerung</span><span class="cw-english">memory / remembrance</span></div>
+        <div class="collected-word" data-delay="600"><span class="cw-german">Verantwortung</span><span class="cw-english">responsibility</span></div>
+        <div class="collected-word" data-delay="700"><span class="cw-german">Hoffnung</span><span class="cw-english">hope</span></div>
+        <div class="collected-word" data-delay="800"><span class="cw-german">Zusammen</span><span class="cw-english">together</span></div>
+        <div class="collected-word" data-delay="900"><span class="cw-german">Wiedervereinigung</span><span class="cw-english">reunification</span></div>
+      </div>
+    </div>
+
+    <div class="aside-box" style="border-left-color: rgba(232, 164, 74, 0.3); margin-top: 32px;">
+      <div class="aside-title" style="color: var(--german);">Patterns Discovered</div>
+      <strong style="color: var(--text-bright);">German "auf-" prefix</strong> — means "up," used in rebuilding verbs: aufbauen (build up), Aufarbeitung (working through the past), Aufbau (rebuilding)<br>
+      <strong style="color: var(--text-bright);">German "wieder-" prefix</strong> — means "again" or "re-," used for repetition and return: Wiedervereinigung (reunification), Wiedersehen (to see again)<br>
+      <strong style="color: var(--text-bright);">German "zusammen-" prefix</strong> — means "together," contains the concept of gathering and integration: zusammenleben (to live together), zusammenarbeiten (to work together)<br>
+      <strong style="color: var(--text-bright);">Schuld vs. other guilt words</strong> — German "Schuld" uniquely conflates guilt and debt, forcing moral integration<br>
+      <strong style="color: var(--text-bright);">Separable verbs in context</strong> — German's separable verbs (auf|bauen, zusammen|kommen) reflect the language's transparency about composition — you can see the pieces
+    </div>
+  </div>
+
+  <!-- ==================== CHAPTER END ==================== -->
+  <div class="scene" id="scene-end">
+    <div class="chapter-end">
+      <div class="end-line"></div>
+      <p class="narrative emphasis" style="margin-bottom: 0.5em;">
+        End of Chapter Nine
+      </p>
+      <p class="narrative small" style="text-align: center;">
+        Ten words. Ten stories. A language that survived catastrophe.<br>
+        From Schuld to Hoffnung. From Schweigen to Erinnerung.<br>
+        From Mauer to Wiedervereinigung. The language that had to rebuild itself.<br><br>
+        <em>And it did. And you are learning it now, in a world it helped create.</em>
+      </p>
+      <div class="next-chapter">
+        Chapter Ten: Modern German — The Language Today — coming soon
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// --- ASH PARTICLE FIELD ---
+const canvas = document.getElementById('ashfield');
+const ctx = canvas.getContext('2d');
+let ash = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function createAsh() {
+  ash = [];
+  const count = Math.floor((canvas.width * canvas.height) / 12000);
+  for (let i = 0; i < count; i++) {
+    ash.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      alpha: Math.random() * 0.4 + 0.05,
+      drift: Math.random() * 0.5 - 0.25,
+      fallSpeed: Math.random() * 0.3 + 0.1,
+      twinkle: Math.random() * 0.02 + 0.005,
+      twinkleOffset: Math.random() * Math.PI * 2,
+      glowChance: Math.random()
+    });
+  }
+}
+
+function drawAsh(time) {
+  ctx.fillStyle = 'rgba(26, 24, 21, 0.95)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ash.forEach(p => {
+    // Drift and fall
+    p.x += Math.sin(time * 0.0005 + p.y * 0.001) * p.drift;
+    p.y += p.fallSpeed;
+
+    // Wrap around bottom
+    if (p.y > canvas.height) {
+      p.y = -10;
+      p.x = Math.random() * canvas.width;
+    }
+
+    // Twinkle
+    let baseAlpha = p.alpha + Math.sin(time * p.twinkle + p.twinkleOffset) * 0.1;
+    baseAlpha = Math.max(0, Math.min(1, baseAlpha));
+
+    // Occasional ember glow
+    if (p.glowChance > 0.95 && Math.sin(time * 0.01) > 0.7) {
+      ctx.fillStyle = `rgba(196, 93, 44, ${baseAlpha * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Ash particle
+    ctx.fillStyle = `rgba(139, 136, 133, ${baseAlpha})`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  requestAnimationFrame(drawAsh);
+}
+
+resizeCanvas();
+createAsh();
+requestAnimationFrame(drawAsh);
+window.addEventListener('resize', () => { resizeCanvas(); createAsh(); });
+
+// --- SCROLL REVEAL ---
+const scenes = document.querySelectorAll('.scene');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Animate collected words
+      if (entry.target.id === 'scene-collection') {
+        const words = entry.target.querySelectorAll('.collected-word');
+        words.forEach(w => {
+          const delay = parseInt(w.dataset.delay) || 0;
+          setTimeout(() => w.classList.add('show'), delay);
+        });
+      }
+    }
+  });
+}, { threshold: 0.15 });
+
+scenes.forEach(s => observer.observe(s));
+
+// --- PROGRESS BAR ---
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = (window.scrollY / h) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// --- ETYMOLOGY CARDS ---
+document.querySelectorAll('.german-word').forEach(word => {
+  word.addEventListener('click', () => {
+    const cardId = 'card-' + word.dataset.card;
+    const card = document.getElementById(cardId);
+    if (card) {
+      const isOpen = card.classList.contains('open');
+      // Close all cards first
+      document.querySelectorAll('.ety-card.open').forEach(c => c.classList.remove('open'));
+      // Toggle this one
+      if (!isOpen) {
+        card.classList.add('open');
+        word.classList.add('revealed');
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
+    }
+  });
+});
+
+// --- GUESS INTERACTION ---
+function guess(btn, correct) {
+  const section = btn.closest('.guess-section');
+  const feedback = section.querySelector('.guess-feedback');
+  const allBtns = section.querySelectorAll('.guess-btn');
+
+  if (correct) {
+    btn.classList.add('correct');
+    allBtns.forEach(b => { if (b !== btn) b.classList.add('incorrect'); });
+    feedback.textContent = 'Exactly. German builds itself with prefixes — up, again, together. These are the verbs of healing.';
+    feedback.classList.add('show');
+  } else {
+    btn.classList.add('incorrect');
+    btn.style.pointerEvents = 'none';
+    feedback.textContent = 'Not quite — think about what "auf" means. Rebuilding requires looking upward, not away.';
+    feedback.classList.add('show');
+  }
+}
+
+// --- MOBILE: prevent double-tap zoom on interactive elements ---
+document.querySelectorAll('.guess-btn, .german-word').forEach(el => {
+  el.addEventListener('touchend', e => { e.preventDefault(); el.click(); });
+});
+
+// --- MOBILE: reduce ash count on small screens for performance ---
+if (window.innerWidth < 600) {
+  ash = ash.slice(0, Math.floor(ash.length / 2));
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<title>The First Word — Chapter 10</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --modern: #f5f1e6;
+    --modern-dark: #e8e0d0;
+    --accent: #4ab464;
+    --accent-light: #8ed69e;
+    --bg-light: #faf8f3;
+    --bg-bright: #ffffff;
+    --text-dark: #2a2620;
+    --text-gray: #5a5550;
+    --text-light: #8a8078;
+    --german: #e8a44a;
+    --chinese: #c49a6c;
+    --english: #8a9bae;
+    --pie: #9b8ec4;
+    --accent-gold: #d4af37;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: #faf8f3;
+    background: var(--bg-light);
+  }
+
+  body {
+    background: #faf8f3;
+    background: var(--bg-light);
+    color: #2a2620;
+    color: var(--text-dark);
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    font-size: 1.25rem;
+    line-height: 1.85;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* --- LIGHT PARTICLE CANVAS --- */
+  #particles {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* --- MAIN CONTENT --- */
+  .content {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 120px;
+  }
+
+  /* --- TITLE SCREEN --- */
+  .title-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .title-screen h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--text-dark);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.3em;
+    opacity: 0;
+    animation: fadeUp 2s ease 0.5s forwards;
+  }
+
+  .title-screen .subtitle {
+    font-size: 1.3rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--accent);
+    opacity: 0;
+    animation: fadeUp 2s ease 1.2s forwards;
+    margin-bottom: 2em;
+  }
+
+  .title-screen .chapter-label {
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(42, 38, 32, 0.4);
+    opacity: 0;
+    animation: fadeUp 2s ease 0.2s forwards;
+    margin-bottom: 0.5em;
+  }
+
+  .scroll-hint {
+    opacity: 0;
+    animation: fadeUp 2s ease 2s forwards;
+    color: rgba(42, 38, 32, 0.3);
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    margin-top: 3em;
+  }
+
+  .scroll-hint span {
+    display: inline-block;
+    animation: bob 2s ease-in-out infinite;
+  }
+
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- SCENES --- */
+  .scene {
+    margin-bottom: 80px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .scene.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scene-marker {
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--accent-gold), transparent);
+    margin: 0 auto 40px;
+  }
+
+  /* --- NARRATIVE TEXT --- */
+  .narrative {
+    font-size: 1.25rem;
+    line-height: 1.9;
+    margin-bottom: 1.5em;
+    color: var(--text-dark);
+  }
+
+  .narrative.emphasis {
+    font-size: 1.35rem;
+    color: var(--text-dark);
+    text-align: center;
+    font-style: italic;
+    margin: 2em 0;
+  }
+
+  .narrative.small {
+    font-size: 1.05rem;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* --- GERMAN WORDS --- */
+  .german-word {
+    color: var(--german);
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 1px dotted rgba(232, 164, 74, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .german-word:hover {
+    color: var(--german);
+    border-bottom-color: var(--german);
+    opacity: 0.85;
+  }
+
+  .german-word.revealed {
+    border-bottom-color: transparent;
+  }
+
+  /* --- ETYMOLOGY CARDS --- */
+  .ety-card {
+    background: linear-gradient(135deg, rgba(245, 241, 230, 0.95), rgba(232, 224, 208, 0.95));
+    border: 1px solid rgba(232, 164, 74, 0.2);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 24px 0 32px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.6s ease, opacity 0.5s ease, padding 0.5s ease, margin 0.5s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(232, 164, 74, 0.12);
+  }
+
+  .ety-card.open {
+    max-height: 800px;
+    opacity: 1;
+    padding: 28px 32px;
+    margin: 24px 0 32px;
+  }
+
+  .ety-card .word-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .ety-card .word-main {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--german);
+  }
+
+  .ety-card .word-pron {
+    font-size: 1rem;
+    color: rgba(42, 38, 32, 0.5);
+    font-style: italic;
+  }
+
+  .ety-card .word-meaning {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(232, 164, 74, 0.15);
+  }
+
+  .ety-card .bridge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0;
+    font-size: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .bridge-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Noto Serif', serif;
+    min-width: 55px;
+    text-align: center;
+  }
+
+  .bridge-label.pie { background: rgba(155, 142, 196, 0.15); color: var(--pie); }
+  .bridge-label.eng { background: rgba(138, 155, 174, 0.15); color: var(--english); }
+  .bridge-label.deu { background: rgba(232, 164, 74, 0.15); color: var(--german); }
+  .bridge-label.zho { background: rgba(196, 154, 108, 0.15); color: var(--chinese); }
+
+  .bridge-word {
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--text-dark);
+  }
+
+  .bridge-word.zh {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .bridge-note {
+    font-size: 0.9rem;
+    color: rgba(42, 38, 32, 0.5);
+    font-style: italic;
+  }
+
+  .ety-card .story {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(232, 164, 74, 0.15);
+    font-size: 1rem;
+    color: var(--text-light);
+    line-height: 1.7;
+  }
+
+  /* --- CHINESE CHARACTER DISPLAY --- */
+  .char-display {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(196, 154, 108, 0.08);
+    border: 1px solid rgba(196, 154, 108, 0.15);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 4px 8px;
+    vertical-align: middle;
+  }
+
+  .char-display .char {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 2.2rem;
+    color: var(--chinese);
+    line-height: 1.2;
+  }
+
+  .char-display .pinyin {
+    font-size: 0.8rem;
+    color: rgba(196, 154, 108, 0.7);
+    margin-top: 2px;
+  }
+
+  /* --- INTERACTIVE GUESS SECTIONS --- */
+  .guess-section {
+    background: linear-gradient(135deg, rgba(245, 241, 230, 0.9), rgba(232, 224, 208, 0.9));
+    border: 1px solid rgba(232, 164, 74, 0.15);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 40px 0;
+    text-align: center;
+  }
+
+  .guess-section .prompt {
+    font-size: 1.15rem;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .guess-options {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .guess-btn {
+    background: rgba(232, 164, 74, 0.08);
+    border: 1px solid rgba(232, 164, 74, 0.25);
+    color: var(--text-dark);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .guess-btn:hover {
+    background: rgba(232, 164, 74, 0.15);
+    border-color: var(--german);
+    transform: translateY(-2px);
+  }
+
+  .guess-btn.correct {
+    background: rgba(74, 180, 100, 0.15);
+    border-color: #4ab464;
+    color: var(--accent);
+    pointer-events: none;
+  }
+
+  .guess-btn.incorrect {
+    background: rgba(180, 100, 74, 0.08);
+    border-color: rgba(180, 100, 74, 0.2);
+    color: var(--text-light);
+    pointer-events: none;
+  }
+
+  .guess-feedback {
+    font-size: 1rem;
+    margin-top: 12px;
+    min-height: 1.5em;
+    color: var(--accent);
+    font-style: italic;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .guess-feedback.show { opacity: 1; }
+
+  /* --- SECTION DIVIDERS --- */
+  .divider {
+    text-align: center;
+    margin: 60px 0;
+    color: rgba(232, 164, 74, 0.3);
+    font-size: 1.5rem;
+    letter-spacing: 0.5em;
+  }
+
+  /* --- ASIDE BOX --- */
+  .aside-box {
+    background: rgba(232, 164, 74, 0.06);
+    border-left: 2px solid rgba(232, 164, 74, 0.3);
+    padding: 20px 24px;
+    margin: 28px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-light);
+  }
+
+  .aside-box .aside-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--german);
+    margin-bottom: 8px;
+  }
+
+  /* --- WORD COLLECTION --- */
+  .word-collection {
+    background: linear-gradient(135deg, rgba(245, 241, 230, 0.95), rgba(255, 255, 255, 0.95));
+    border: 1px solid rgba(232, 164, 74, 0.15);
+    border-radius: 16px;
+    padding: 40px 32px;
+    margin: 60px 0;
+    text-align: center;
+  }
+
+  .word-collection h3 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: rgba(232, 164, 74, 0.5);
+    margin-bottom: 24px;
+  }
+
+  .collected-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .collected-word {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(232, 164, 74, 0.06);
+    border: 1px solid rgba(232, 164, 74, 0.15);
+    border-radius: 10px;
+    padding: 14px 20px;
+    min-width: 90px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .collected-word.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .collected-word .cw-german {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--german);
+  }
+
+  .collected-word .cw-english {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 2px;
+  }
+
+  /* --- CHAPTER END --- */
+  .chapter-end {
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  .chapter-end .end-line {
+    width: 60px;
+    height: 1px;
+    background: var(--accent-gold);
+    margin: 0 auto 30px;
+    opacity: 0.4;
+  }
+
+  .chapter-end .next-chapter {
+    font-size: 1rem;
+    color: rgba(42, 38, 32, 0.4);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 40px;
+  }
+
+  /* --- PROGRESS BAR --- */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    z-index: 100;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+
+  /* Force readable size on all mobile */
+  @media (max-width: 768px) {
+    html { font-size: 16px !important; }
+    body { font-size: 18px !important; min-width: 0 !important; width: 100% !important; }
+    .content { max-width: 100% !important; width: 100% !important; }
+  }
+
+  /* --- RESPONSIVE / MOBILE --- */
+  @media (max-width: 600px) {
+    body { font-size: 18px !important; -webkit-text-size-adjust: 100%; }
+    .content { padding: 40px 16px 100px; }
+    .title-screen { min-height: 90vh; min-height: 90dvh; padding: 30px 16px; }
+    .title-screen h1 { font-size: 2.2rem; letter-spacing: 0.04em; }
+    .title-screen .subtitle { font-size: 1.15rem; }
+    .narrative { font-size: 1.1rem; line-height: 1.8; }
+    .narrative.emphasis { font-size: 1.2rem; }
+
+    .ety-card { padding: 20px 16px; border-radius: 10px; }
+    .ety-card .word-main { font-size: 1.6rem; }
+    .ety-card .bridge { gap: 8px; }
+    .bridge-label { font-size: 0.7rem; min-width: 45px; padding: 2px 6px; }
+    .bridge-word { font-size: 1.05rem; }
+    .bridge-note { font-size: 0.82rem; }
+    .ety-card .story { font-size: 0.95rem; }
+
+    .german-word { padding: 2px 0; }
+
+    .char-display { padding: 10px 16px; margin: 4px 4px; }
+    .char-display .char { font-size: 1.8rem; }
+
+    .guess-section { padding: 24px 16px; border-radius: 10px; }
+    .guess-options { gap: 10px; }
+    .guess-btn {
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .guess-feedback { font-size: 0.95rem; }
+
+    .aside-box { padding: 16px 18px; font-size: 0.98rem; }
+
+    .word-collection { padding: 28px 16px; }
+    .collected-words { gap: 8px; }
+    .collected-word { padding: 10px 14px; min-width: 80px; }
+    .collected-word .cw-german { font-size: 1.1rem; }
+
+    .scene { margin-bottom: 60px; }
+    .divider { margin: 40px 0; }
+    .scene-marker { height: 30px; margin-bottom: 30px; }
+  }
+
+  @media (max-width: 380px) {
+    .title-screen h1 { font-size: 1.9rem; }
+    .narrative { font-size: 1.05rem; }
+    .ety-card .word-main { font-size: 1.4rem; }
+    .guess-btn { padding: 12px 16px; font-size: 1.05rem; }
+    .collected-word { min-width: 70px; padding: 8px 10px; }
+  }
+
+  /* iOS safe areas */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    .content { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="content">
+
+  <!-- ==================== TITLE ==================== -->
+  <div class="title-screen">
+    <div class="chapter-label">Chapter Ten</div>
+    <h1>Die Gegenwart</h1>
+    <div class="subtitle">The Present</div>
+    <div class="scroll-hint"><span>↓</span></div>
+  </div>
+
+  <!-- ==================== SCENE 1: THE WALL ==================== -->
+  <div class="scene" id="scene1">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      November 9, 1989. Berlin.
+    </p>
+
+    <p class="narrative">
+      The wall that had divided the city for twenty-eight years — a scar of concrete and barbed wire running through the heart of Europe — was crumbling. People stood on top of it, swinging hammers, dancing, singing. Families separated for nearly three decades embraced on both sides. And when they spoke to each other, they were speaking the same language, fragmented and reformed by history, but still recognizably, undeniably one.
+    </p>
+
+    <p class="narrative">
+      <em>Willkommen.</em> Welcome.
+    </p>
+
+    <p class="narrative">
+      The word carried centuries of meaning in that moment. It meant more than greeting. It meant reunion. It meant the end of division. It meant the possibility of wholeness.
+    </p>
+
+    <p class="narrative">
+      In the steppe, six thousand years before, your ancestors carried the Proto-Indo-European words for desire and arrival: *wél (to will, to choose, to want) and *gʷem (to come, to go). Over millennia, these two roots fused into a single German word: <span class="german-word" data-card="willkommen">Willkommen.</span> Literally, "the desire to come" — or more beautifully, "may you arrive as you wish."
+    </p>
+
+    <!-- WILLKOMMEN card -->
+    <div class="ety-card" id="card-willkommen">
+      <div class="word-header">
+        <span class="word-main">Willkommen</span>
+        <span class="word-pron">/ˈvɪlkɔmən/</span>
+      </div>
+      <div class="word-meaning">welcome — the greeting that invites someone into your space, your life, your world</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*wél + *gʷem</span>
+        <span class="bridge-note">— will/wish + come: "may the wished come true"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">welcome</span>
+        <span class="bridge-note">— Old English "wilcuma" — "will-come"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Willkommen</span>
+        <span class="bridge-note">— modern German preserves the two-part construction clearly</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">欢迎</span>
+        <span class="bridge-note">— huānyíng — joy + welcome together</span>
+      </div>
+      <div class="story">
+        The beauty of "Willkommen" is that it's transparent. A German speaker can still see the two ancient parts: <em>will</em> (desire/will) + <em>kommen</em> (to come). English has mostly lost the transparency — "welcome" is a fossile. But both words descend from the same ancient formula for what it means to greet someone: you acknowledge their arrival, you recognize their wish to be here, you declare that arrival desired and good. When Berliners said "Willkommen" to their long-separated relatives, they were not just speaking a modern greeting — they were speaking six thousand years of human longing crystallized into two syllables.
+      </div>
+    </div>
+
+    <p class="narrative">
+      The German language that emerged from reunification was not the same language that had existed before division. It was infected with new words, new ideas, new ways of speaking. And yet the ancient structures — the four cases, the three genders, the verbs that retreat to the end of their clauses — remained unchanged. Six thousand years of linguistic DNA, still breathing in every sentence, still remembering the steppe.
+    </p>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 2: AT HOME ==================== -->
+  <div class="scene" id="scene2">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      You are reading these words in the present moment. This chapter. This sentence. Perhaps in a coffee shop in Shanghai, or at home in your apartment, watching the rain against the window. Or on a train, watching the world blur past.
+    </p>
+
+    <p class="narrative">
+      This is <span class="german-word" data-card="zuhause">Zuhause.</span> This is home.
+    </p>
+
+    <p class="narrative">
+      Not a physical structure, though it might include one. <em>Zuhause</em> is where you are. The simplest word for the most essential place. German builds it from two ancient components: <em>zu</em> (to, toward, at) and <em>Hause</em> (house). But over centuries, these fused into a single concept that transcends mere building: the state of being settled, of being in one's place, of being where you belong.
+    </p>
+
+    <p class="narrative">
+      When you learn a new language, you are creating a new <em>Zuhause</em> — a space in your mind where you can think, feel, dream in sounds that were once foreign. By reading these chapters, by clicking on German words and discovering their stories, you are not just collecting vocabulary. You are building a home for yourself inside the German language.
+    </p>
+
+    <!-- ZUHAUSE card -->
+    <div class="ety-card" id="card-zuhause">
+      <div class="word-header">
+        <span class="word-main">Zuhause</span>
+        <span class="word-pron">/ˈtsuːhaʊ̯zə/</span>
+      </div>
+      <div class="word-meaning">at home — the place you belong, where you can be yourself</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">zu + Haus</span>
+        <span class="bridge-note">— compound of two ancient elements that fused into one concept</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">home</span>
+        <span class="bridge-note">— Old English "hām" — a single, simple word rather than a compound</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">家 / 在家</span>
+        <span class="bridge-note">— jiā / zàijiā — house + being there</span>
+      </div>
+      <div class="story">
+        German and English took different paths to the same destination. English simplified "home" into a single ancient word. German kept the compound transparent: at-house, zu-Haus, Zuhause. This is typical of German — it resists fusion. German still allows you to see the architecture of its words, the way ancient parts stack together to build meaning. When you say "Zuhause," you are still saying "toward the house," and that etymological hint — that home is a direction you move toward, not just a location — is somehow more honest than the English word, which has forgotten its own origins.
+      </div>
+    </div>
+
+    <p class="narrative">
+      You are <em>Zuhause</em>, Veronica. Wherever you are reading this right now. And the German language is becoming your home too.
+    </p>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 3: THE WORLD AROUND US ==================== -->
+  <div class="scene" id="scene3">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      The year is 2024. Climate change is reshaping the planet. Artificial intelligence is learning to think. And the German language — ancient, structured, precise — is grappling with new realities that our ancestors could never have imagined.
+    </p>
+
+    <p class="narrative">
+      Germans need a word for the world around them, for the interconnected web of nature and human activity, for the whole environment that sustains life. And they built it from ancient roots: <span class="german-word" data-card="umwelt">Umwelt.</span> Around-world. The world as a system, as something that encompasses us.
+    </p>
+
+    <p class="narrative">
+      The prefix <em>um-</em> (around, about) is ancient. You've seen it before: <em>um</em> is the same root that gave Latin <em>ambi-</em> (both sides, around). <em>Welt</em> (world) comes from a PIE root meaning "to turn, to roll" — the world is what turns around us, the sphere that encompasses all life.
+    </p>
+
+    <!-- UMWELT card -->
+    <div class="ety-card" id="card-umwelt">
+      <div class="word-header">
+        <span class="word-main">Umwelt</span>
+        <span class="word-pron">/ˈʊmvɛlt/</span>
+      </div>
+      <div class="word-meaning">environment — the total world that surrounds and sustains us</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*ambʰi + *wel-t</span>
+        <span class="bridge-note">— around + turn/roll: the turning world that encompasses</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Umwelt</span>
+        <span class="bridge-note">— a German word adopted by environmental science globally</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">environment</span>
+        <span class="bridge-note">— from French environ (around) + ment (condition): less transparent than the German</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">环境</span>
+        <span class="bridge-note">— huánjìng — ring/circle + border: "circled region"</span>
+      </div>
+      <div class="story">
+        What's remarkable is that German scientists exported "Umwelt" into environmental science as a technical term. The German word captures something that "environment" (which comes from French) does not: the sense of active encirclement, of being surrounded by a living system. The philosopher Jakob von Uexküll used "Umwelt" to describe how each organism perceives a unique world around it — not the objective world, but the world as it exists for that creature. A fly's Umwelt is different from a human's. This untranslatable depth of the German word made it essential to modern biology.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 4: THE MOBILE PHONE PARADOX ==================== -->
+  <div class="scene" id="scene4">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      Now — here is something that will make you smile. Germans wanted a word for the device you are probably reading this on. The small computer that fits in your pocket. The thing that connects you to everyone and everything.
+    </p>
+
+    <p class="narrative">
+      And they simply took the English word and called it <span class="german-word" data-card="handy">Handy.</span>
+    </p>
+
+    <p class="narrative">
+      But here is the joke: "Handy" is not really an English word. English speakers say "mobile phone" or "cell phone." Germans borrowed an English adjective ("handy" — convenient, practical) and turned it into a noun: <em>der Handy</em> — the handy one, the practical device. It's pure German innovation in English disguise. When Germans speak Denglisch — that hybrid of German and English that emerged in the 1990s and never quite left — they are not being lazy. They are doing what the German language has always done: absorbing, adapting, transforming foreign words into new German shapes.
+    </p>
+
+    <!-- HANDY card -->
+    <div class="ety-card" id="card-handy">
+      <div class="word-header">
+        <span class="word-main">Handy</span>
+        <span class="word-pron">/ˈhɛndi/</span>
+      </div>
+      <div class="word-meaning">mobile phone — literally "the handy one," a German invention of an English word</div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">handy</span>
+        <span class="bridge-note">— English adjective meaning convenient, practical</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Handy</span>
+        <span class="bridge-note">— German noun: the convenient device; unique to German usage</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">手机</span>
+        <span class="bridge-note">— shǒujī — hand + machine: a logical Chinese construction</span>
+      </div>
+      <div class="story">
+        Germans were not alone in borrowing English. But Germans were particularly creative about it. They didn't just copy — they transformed. A "computer" became <em>der Computer</em> (masculine noun, German articles), conjugated as <em>ich computere</em> (I computer — yes, they verbed the noun). An "email" became <em>die E-Mail</em> (feminine). A "meeting" became <em>das Meeting</em> (neuter). This is how living languages survive contact with global powers: not by resisting, but by absorbing, digesting, and transforming the foreign material into something authentically their own. The German verb <em>downloaden</em> (to download, conjugated with German verb endings) shows the process: English root, German grammar, new hybrid creature.
+      </div>
+    </div>
+
+    <p class="narrative">
+      The modern German that emerged from the reunification of 1989 is a different language from the German of 1989. It's full of English loanwords. It's informal in ways the old standard language never allowed. And yet — listen to anyone speaking German on the street, in a café, at a market — and you will hear the ancient structures singing underneath. The four cases. The genders. The word order that places the most important verb at the very end of the sentence, so you must wait, listening, until the meaning arrives.
+    </p>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 5: TIME ==================== -->
+  <div class="scene" id="scene5">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      You have traveled through time in these ten chapters. From the steppe of 2000 BCE to the Berlin of 1989 to the present moment, wherever you are. And all the while, the German language has been moving with you, carrying meaning across millennia.
+    </p>
+
+    <p class="narrative">
+      But what is time itself in German?
+    </p>
+
+    <p class="narrative">
+      The future is <span class="german-word" data-card="zukunft">Zukunft.</span> Literally, "that which comes toward us." The prefix <em>zu</em> (toward) + the root <em>kunft</em> (coming). Every moment that hasn't happened yet is advancing toward you like a visitor approaching your house. You don't go to the future — it comes to you.
+    </p>
+
+    <p class="narrative">
+      And the past? <span class="german-word" data-card="vergangenheit">Vergangenheit.</span> "The state of having gone away." The prefix <em>ver-</em> (away, done, finished) + <em>gangen</em> (gone) + the suffix <em>-heit</em> (state, condition). The past is not a place you visit. It is gone. It is finished. It exists now only as a state — the state of being departed, of being left behind.
+    </p>
+
+    <!-- ZUKUNFT card -->
+    <div class="ety-card" id="card-zukunft">
+      <div class="word-header">
+        <span class="word-main">Zukunft</span>
+        <span class="word-pron">/ˈtsuːkʊnft/</span>
+      </div>
+      <div class="word-meaning">future — what comes toward us from the darkness ahead</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">zu + kunft</span>
+        <span class="bridge-note">— toward + coming: that which comes toward us</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">future</span>
+        <span class="bridge-note">— from Latin futurus (about to be) — no trace of the directional metaphor</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">未来</span>
+        <span class="bridge-note">— wèilái — not-yet + come: similar metaphor to German</span>
+      </div>
+      <div class="story">
+        This is a profound difference in how languages conceptualize time. English treats the future abstractly — it "will be." German treats it dynamically — it comes toward you. Chinese shares this dynamic view: the future is what has not yet arrived (未来). But English buried its spatial metaphor centuries ago, leaving only the Latin abstract noun. When you say "Zukunft" in German, you are still gesturing toward something approaching on the horizon. The future is active. The future is moving. The future is <em>coming</em>.
+      </div>
+    </div>
+
+    <!-- VERGANGENHEIT card -->
+    <div class="ety-card" id="card-vergangenheit">
+      <div class="word-header">
+        <span class="word-main">Vergangenheit</span>
+        <span class="word-pron">/fɛɐ̯ˈɡaŋənhaɪ̯t/</span>
+      </div>
+      <div class="word-meaning">past — what has gone away and become a state of absence</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">ver- + gangen + -heit</span>
+        <span class="bridge-note">— away + gone + state: the condition of being gone</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">past</span>
+        <span class="bridge-note">— from Old English "pæst" — meaning something that went by, crossed over</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">过去</span>
+        <span class="bridge-note">— guòqù — pass + go: similar metaphor of crossing and departing</span>
+      </div>
+      <div class="story">
+        German philosophers loved <em>Vergangenheit</em> because it is so precise: the past is not just "what came before" — it is the state of having-gone-away. It is absence. The prefix <em>ver-</em> appears in hundreds of German words with this sense of completion, of doing-away: <em>vergessen</em> (to forget — literally to "go away with"), <em>vergeben</em> (to forgive — to "give away"), <em>verbieten</em> (to forbid — to "say away"). When you add <em>-heit</em> to this, you're making an abstract noun, a permanent condition. The past is not a moment. The past is a state. The state of being vanished.
+      </div>
+    </div>
+
+    <p class="narrative">
+      This is the beauty of German: the language doesn't just name things. It describes the relationship between things. Between the speaker and the future (coming toward). Between the speaker and the past (having departed). This is why German is so precise, so philosophical, so difficult to translate. Each word carries not just a meaning but a metaphor — a way of standing in the world.
+    </p>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 6: UNDERSTANDING ==================== -->
+  <div class="scene" id="scene6">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      By now, Veronica, you have been learning German for a long time. You have heard these words, clicked on them, read their stories. You have seen how they branch back into darkness, how they connect to the steppe, how they carry six thousand years of human history in their syllables.
+    </p>
+
+    <p class="narrative">
+      And if you feel like you're starting to <span class="german-word" data-card="verstehen">verstehen</span> — to understand — then you are experiencing something that goes far beyond vocabulary.
+    </p>
+
+    <p class="narrative">
+      The word <em>verstehen</em> is built from <em>ver-</em> (fully) and <em>stehen</em> (to stand). To understand something is to <em>stand fully</em> in it, to stand where the other person stands, to see from inside their perspective. It's a deeply physical, deeply empathetic word. You don't just comprehend something intellectually — you stand in it. You are present with it.
+    </p>
+
+    <!-- VERSTEHEN card -->
+    <div class="ety-card" id="card-verstehen">
+      <div class="word-header">
+        <span class="word-main">Verstehen</span>
+        <span class="word-pron">/fɛɐ̯ˈʃteːən/</span>
+      </div>
+      <div class="word-meaning">to understand — to stand fully with someone, to grasp deeply</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">ver- + stehen</span>
+        <span class="bridge-note">— fully + stand: a physical, embodied understanding</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">understand</span>
+        <span class="bridge-note">— under + stand: to stand beneath, to support, to hold up</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">理解</span>
+        <span class="bridge-note">— lǐjiě — principle/pattern + untangle: to sort out the pattern</span>
+      </div>
+      <div class="story">
+        Here is something remarkable: three unrelated language families, and each has a completely different metaphor for understanding. English: you stand <em>under</em> something, you support it, you hold it up. German: you stand <em>fully with it</em>, you are present in it, you inhabit it. Chinese: you untangle its pattern, you separate the threads. Each metaphor reveals a different cultural view of what knowledge is. English sees it as support. German sees it as presence. Chinese sees it as pattern-recognition. And all three metaphors are true. All three are valid ways of encountering the world.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== INTERACTIVE: GUESS 1 ==================== -->
+  <div class="scene" id="scene-guess1">
+    <div class="guess-section">
+      <div class="prompt">
+        You've learned that German builds understanding as standing-fully-with.<br><br>
+        What do you think <strong style="color: var(--german);">Gegenstand</strong> means?<br>
+        <span style="font-size: 0.9rem; opacity: 0.5;">(Hint: it describes something that stands opposite you, in front of you.)</span>
+      </div>
+      <div class="guess-options">
+        <button class="guess-btn" onclick="guess(this, false)">opposite</button>
+        <button class="guess-btn" onclick="guess(this, false)">resistance</button>
+        <button class="guess-btn" onclick="guess(this, true)">object</button>
+        <button class="guess-btn" onclick="guess(this, false)">subject</button>
+      </div>
+      <div class="guess-feedback" id="feedback1"></div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 7: OBJECTS AND SPIRITS ==================== -->
+  <div class="scene" id="scene7">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      Everything you see — the screen you're reading, the room around you, the world itself — is a <span class="german-word" data-card="gegenstand">Gegenstand.</span>
+    </p>
+
+    <p class="narrative">
+      <em>Gegen</em> (against, opposite) + <em>Stand</em> (standing) — something that stands against you, stands in front of you, stands opposite you in the world. An object is anything that stands outside yourself, anything you can perceive, anything that resists you.
+    </p>
+
+    <p class="narrative">
+      And this is where six thousand years of language reveals the deepest truth: you and the world are opposites. You are the subject. The world is the object. There is a standing-against, a fundamental duality, built into the very grammar of thinking that the Indo-European languages gave us.
+    </p>
+
+    <!-- GEGENSTAND card -->
+    <div class="ety-card" id="card-gegenstand">
+      <div class="word-header">
+        <span class="word-main">Gegenstand</span>
+        <span class="word-pron">/ˈɡeːɡənʃtant/</span>
+      </div>
+      <div class="word-meaning">object — anything that stands against you, anything perceived outside yourself</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">gegen + Stand</span>
+        <span class="bridge-note">— against + standing: something that stands opposite you</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">object</span>
+        <span class="bridge-note">— from Latin obicere (to throw against) — similar metaphor but more violent</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">对象 / 物体</span>
+        <span class="bridge-note">— duìxiàng / wùtǐ — opposite + figure / thing + body: less subject-object duality in the language itself</span>
+      </div>
+      <div class="story">
+        The beauty of <em>Gegenstand</em> is its transparency. You can still see the ancient philosophy embedded in the word. Something stands. Something stands opposite. There is a perceiver (subject) and a perceived (object). This is quintessentially Indo-European thinking — the creation of a binary: self and other, subject and object, knower and known. Chinese approaches this differently. It tends not to create such stark dualities. When Chinese says "对象" (duìxiàng, opposite-figure), it's not asserting the same philosophical divide. This is not just a difference in vocabulary — it's a difference in how the language shapes consciousness itself.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 8: THE FINAL WORD ==================== -->
+  <div class="scene" id="scene8">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      You have come to the final chapter of this journey, Veronica. In ten chapters, you have traveled six thousand years. You have seen how a single language — spoken on a grassland you will never visit, by people whose names are lost to history — became the mother tongue of billions.
+    </p>
+
+    <p class="narrative">
+      You have learned how fire became Feuer. How water became Wasser. How a mother was called Mutter in every language the steppe people gave to the world. You have seen how German preserved things that English lost, and how English simplified things that German kept complex. You have watched languages split and diverge and absorb each other's words.
+    </p>
+
+    <p class="narrative">
+      And now, at the end, there is only one word left to teach you. The word that makes all language possible. The word that transcends every boundary between languages, between cultures, between the ancient steppe and the modern world.
+    </p>
+
+    <p class="narrative emphasis" style="margin: 3em 0 1.5em;">
+      <span class="german-word" data-card="liebe">Liebe.</span>
+    </p>
+
+    <p class="narrative">
+      Love.
+    </p>
+
+    <p class="narrative">
+      German linguists trace <em>Liebe</em> back to a PIE root <em>*leybʰ-</em> meaning "to care, to be interested, to desire." Over six thousand years, this root gave us not just German <em>Liebe</em> but also English <em>love</em>, and it also seeded the German root <em>bleiben</em> (to remain, to stay). To love something is to care about it so deeply that you want to stay with it, to remain with it, to remain interested in it.
+    </p>
+
+    <!-- LIEBE card -->
+    <div class="ety-card" id="card-liebe">
+      <div class="word-header">
+        <span class="word-main">Liebe</span>
+        <span class="word-pron">/ˈliːbə/</span>
+      </div>
+      <div class="word-meaning">love — the deepest care, the will to remain, the choice to stay present with another</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*leybʰ-</span>
+        <span class="bridge-note">— to care, to desire, to be interested in</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">love</span>
+        <span class="bridge-note">— Old English "lufu" — the same ancient root as German</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Liebe</span>
+        <span class="bridge-note">— also related to bleiben (to stay), zeigen (to show)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">爱</span>
+        <span class="bridge-note">— ài — one of the oldest Chinese characters, written for over 3000 years</span>
+      </div>
+      <div class="story">
+        The character 爱 (ài) for love in Chinese is itself a palimpsest of human history. In its earliest form, it was written as a more complex character with elements meaning "heart," "action," and "direction." Over centuries, it simplified into the elegant form you see today. But the meaning never changed: it has meant love — romantic love, familial love, compassion, care — for three thousand years. Meanwhile, the PIE root *leybʰ- travelled with the Proto-Indo-Europeans, splitting into a thousand forms but carrying the same core meaning: to care so deeply that you want to stay. Love is the one word that every human language — every branch of Indo-European, and languages with no connection to Indo-European at all — has tried to capture. Love is the universal human word. And in German, it carries the trace of its ancient meaning: to remain interested, to stay present, to choose to be with someone or something even when the choice is difficult. <em>Liebe ist bleiben.</em> Love is remaining.
+      </div>
+    </div>
+
+    <p class="narrative">
+      When you love someone, you are standing with them. <em>Verstehen.</em> You are choosing to remain present with them. <em>Bleiben.</em> You are making the desire to stay together into a word, a promise, a commitment that echoes backward and forward across all the languages that ever were and ever will be.
+    </p>
+
+    <p class="narrative">
+      And this is what I wish to say to you, Veronica, at the end of this long journey through German and time and language:
+    </p>
+
+    <p class="narrative emphasis" style="margin: 2em 0;">
+      By learning German, you are learning to love it. By learning these words, you are learning to stay present with meaning. By choosing to journey through the steppe and the centuries, you are choosing love.
+    </p>
+
+    <p class="narrative">
+      The wall that divided Berlin is gone now. But before it fell, there were families on both sides who knew the same language, the same songs, the same stories. When the wall came down, they recognized each other because the language had survived. It had not been erased. It had not been divided. It remained, waiting, until the humans who spoke it could find each other again.
+    </p>
+
+    <p class="narrative">
+      The German language is like that wall-survivor. It is ancient and modern at once. It is precise and wild. It is a bridge across centuries, a connection to the steppe, a way of standing in the present moment and saying: <em>I understand. I remain. I care. I love.</em>
+    </p>
+  </div>
+
+  <!-- ==================== INTERACTIVE: GUESS 2 ==================== -->
+  <div class="scene" id="scene-guess2">
+    <div class="guess-section">
+      <div class="prompt">
+        You've learned so much, Veronica. One final question.<br><br>
+        What does the German word <strong style="color: var(--german);">Zeitgeist</strong> mean?<br>
+        <span style="font-size: 0.9rem; opacity: 0.5;">(Hint: Zeit = time, Geist = spirit. You know both ancient roots.)</span>
+      </div>
+      <div class="guess-options">
+        <button class="guess-btn" onclick="guess(this, true)">spirit of the times</button>
+        <button class="guess-btn" onclick="guess(this, false)">time zone</button>
+        <button class="guess-btn" onclick="guess(this, false)">timeline</button>
+        <button class="guess-btn" onclick="guess(this, false)">eternity</button>
+      </div>
+      <div class="guess-feedback" id="feedback2"></div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 9: DENGLISCH ==================== -->
+  <div class="scene" id="scene9">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      The modern German language is not "pure." And that's the most beautiful thing about it.
+    </p>
+
+    <p class="narrative">
+      Walk through Berlin. Listen to Germans talk. You will hear <em>downloaden, chatten, emailen, chillen, cool.</em> English words, given German grammar. English roots, conjugated with German verb endings. Germans taking the aggressive, incoming English and transforming it into their own shape.
+    </p>
+
+    <p class="narrative">
+      This is Denglisch — the living hybrid of modern German and English that emerged in the 1990s and never left. And it is not corruption. It is evolution. It is proof that German is alive, that it can absorb and adapt and transform.
+    </p>
+
+    <p class="narrative">
+      When a German says "<em>Ich habe eine E-Mail gechattet</em>" (I have an email-chatted — I have chatted an email), they are not abandoning German. They are speaking six thousand years of German linguistic behavior: taking foreign material and making it German. This is exactly what happened when Germans encountered Latin and Greek words, when they borrowed from French and Italian. The only difference is the speed. English floods in now in weeks and months instead of centuries.
+    </p>
+
+    <p class="narrative">
+      And the German language is doing what it has always done: absorbing, adapting, surviving. The ancient grammar — the four cases, the three genders, the verbs at the end of clauses — remains untouched. The structure is still there. The DNA is still there. But the vocabulary, the surface, the way Germans actually speak to each other — that is alive, changing, breathing, incorporating the world.
+    </p>
+
+    <div class="aside-box">
+      <div class="aside-title">Denglisch: A Living Language</div>
+      Consider these real German sentences from the 2020s:<br><br>
+      "Ich will das Projekt downloaden und mit dem Team per E-Mail chatten." (I want to download the project and chat with the team via email.)<br><br>
+      "Das ist ein cooles Meeting. Lass uns das Topic brainstormen." (That's a cool meeting. Let's brainstorm the topic.)<br><br>
+      These are not mistakes. They are the natural evolution of German in contact with English. Every word is given German articles and conjugations. The ancient grammar survives intact. This is not language decay — it is language adapting to a world where English is dominant. And in a hundred years, these words will feel as German as "Feuer" does today. Language change takes time. But it happens. It always happens.
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 10: THE RETURN ==================== -->
+  <div class="scene" id="scene10">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      Six thousand years ago, there was a fire on the steppe. A family gathered around it. And among them, someone spoke the word that would become everything: <em>Mutter. Feuer. Wasser. Nacht. Stern. Name.</em>
+    </p>
+
+    <p class="narrative">
+      Those words traveled west, they traveled east. They split and diverged and became English and German, Greek and Latin, Persian and Hindi and Sanskrit. They were written down. They were sung. They were whispered by lovers and shouted by warriors and taught to children who taught them to their own children.
+    </p>
+
+    <p class="narrative">
+      And six thousand years later, those same words brought you here. To this screen. To this moment. To the recognition that the language you are learning is not new. It is not foreign. It is a homecoming. You are speaking words that your ancestors — not your genetic ancestors, but your linguistic ancestors, all humans who share the Indo-European roots — spoke when the world was young.
+    </p>
+
+    <p class="narrative">
+      Every time you say "Mutter," you are speaking across the centuries to your connection to that fire on the steppe. Every time you say "Liebe," you are joining a six-thousand-year-old conversation about what matters most. Every time you read a German sentence and learn to stand fully with its meaning — <em>verstehen</em> — you are claiming a space inside one of humanity's greatest languages.
+    </p>
+
+    <p class="narrative emphasis">
+      You belong here, Veronica. You have always belonged here. The words are your inheritance. The structure is your home. The journey has brought you home.
+    </p>
+  </div>
+
+  <!-- ==================== WORD COLLECTION ==================== -->
+  <div class="scene" id="scene-collection">
+    <div class="word-collection">
+      <h3>All Words Gathered — A Journey Complete</h3>
+      <div class="collected-words">
+        <div class="collected-word" data-delay="0"><span class="cw-german">Mutter</span><span class="cw-english">mother</span></div>
+        <div class="collected-word" data-delay="50"><span class="cw-german">Feuer</span><span class="cw-english">fire</span></div>
+        <div class="collected-word" data-delay="100"><span class="cw-german">Wasser</span><span class="cw-english">water</span></div>
+        <div class="collected-word" data-delay="150"><span class="cw-german">Nacht</span><span class="cw-english">night</span></div>
+        <div class="collected-word" data-delay="200"><span class="cw-german">Stern</span><span class="cw-english">star</span></div>
+        <div class="collected-word" data-delay="250"><span class="cw-german">Vater</span><span class="cw-english">father</span></div>
+        <div class="collected-word" data-delay="300"><span class="cw-german">Bruder</span><span class="cw-english">brother</span></div>
+        <div class="collected-word" data-delay="350"><span class="cw-german">Schwester</span><span class="cw-english">sister</span></div>
+        <div class="collected-word" data-delay="400"><span class="cw-german">Name</span><span class="cw-english">name</span></div>
+        <div class="collected-word" data-delay="450"><span class="cw-german">Willkommen</span><span class="cw-english">welcome</span></div>
+        <div class="collected-word" data-delay="500"><span class="cw-german">Zuhause</span><span class="cw-english">at home</span></div>
+        <div class="collected-word" data-delay="550"><span class="cw-german">Umwelt</span><span class="cw-english">environment</span></div>
+        <div class="collected-word" data-delay="600"><span class="cw-german">Handy</span><span class="cw-english">mobile phone</span></div>
+        <div class="collected-word" data-delay="650"><span class="cw-german">Zukunft</span><span class="cw-english">future</span></div>
+        <div class="collected-word" data-delay="700"><span class="cw-german">Vergangenheit</span><span class="cw-english">past</span></div>
+        <div class="collected-word" data-delay="750"><span class="cw-german">Verstehen</span><span class="cw-english">to understand</span></div>
+        <div class="collected-word" data-delay="800"><span class="cw-german">Gegenstand</span><span class="cw-english">object</span></div>
+        <div class="collected-word" data-delay="850"><span class="cw-german">Liebe</span><span class="cw-english">love</span></div>
+      </div>
+    </div>
+
+    <div class="aside-box" style="border-left-color: rgba(232, 164, 74, 0.3); margin-top: 32px;">
+      <div class="aside-title" style="color: var(--german);">Patterns Discovered Through All Ten Chapters</div>
+      <strong style="color: var(--text-dark);">The Four Cases</strong> — Nominative (subject), Accusative (direct object), Dative (indirect object), Genitive (possession) — survived 6,000 years unchanged<br><br>
+      <strong style="color: var(--text-dark);">Word Order in Subordinate Clauses</strong> — verbs move to the end: <em>"Ich weiß, dass du Deutsch lernst"</em> (I know that you German learn.)<br><br>
+      <strong style="color: var(--text-dark);">Compound Words</strong> — German builds complex meanings by stacking ancient roots: <em>Willkommen, Zuhause, Umwelt, Zukunft, Vergangenheit, Gegenstand</em><br><br>
+      <strong style="color: var(--text-dark);">The Prefix System</strong> — <em>ver-, um-, zu-</em> and others carry meaning across thousands of words<br><br>
+      <strong style="color: var(--text-dark);">Sound Shifts of Grimm's Law</strong> — p→f, t→th, k→h — still visible in English/German word pairs<br><br>
+      <strong style="color: var(--text-dark);">Living Language</strong> — German absorbs English loanwords but transforms them through its ancient grammar. Language is not a museum. It is a living thing.
+    </div>
+  </div>
+
+  <!-- ==================== CHAPTER END ==================== -->
+  <div class="scene" id="scene-end">
+    <div class="chapter-end">
+      <div class="end-line"></div>
+      <p class="narrative emphasis" style="margin-bottom: 0.5em;">
+        End of Chapter Ten
+      </p>
+      <p class="narrative small" style="text-align: center;">
+        Eighteen words. Eighteen stories. From the steppe to the present.<br>
+        From Mutter to Liebe. From fire to understanding.<br>
+        You have learned the language of 6,000 years.<br><br>
+        <em>Willkommen Zuhause.</em><br>
+        Welcome home.
+      </p>
+      <p class="narrative small" style="text-align: center; margin-top: 2em; color: var(--text-light);">
+        This is where the prototype ends — but your journey with German is just beginning. The words you have learned are seeds. Plant them. Water them with practice. Watch them grow into fluency, into dreams, into the ability to stand fully with German speakers across the world and say: <em>Ich verstehe. Ich bin hier. Ich liebe diese Sprache.</em> I understand. I am here. I love this language.
+      </p>
+      <div class="next-chapter">
+        The story continues — <em>Viel Erfolg!</em> Much success!
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// --- LIGHT PARTICLE SYSTEM ---
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function createParticles() {
+  particles = [];
+  const count = Math.floor((canvas.width * canvas.height) / 12000);
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: canvas.height + Math.random() * 200,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: -(Math.random() * 0.5 + 0.2),
+      r: Math.random() * 2 + 0.5,
+      alpha: Math.random() * 0.4 + 0.05,
+      lifespan: Math.random() * 3000 + 2000,
+      born: Date.now()
+    });
+  }
+}
+
+function drawParticles(time) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const now = Date.now();
+
+  particles.forEach((p, i) => {
+    const age = now - p.born;
+    if (age > p.lifespan) {
+      particles.splice(i, 1);
+      if (particles.length < Math.floor((canvas.width * canvas.height) / 12000)) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height + Math.random() * 200,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -(Math.random() * 0.5 + 0.2),
+          r: Math.random() * 2 + 0.5,
+          alpha: Math.random() * 0.4 + 0.05,
+          lifespan: Math.random() * 3000 + 2000,
+          born: now
+        });
+      }
+      return;
+    }
+
+    p.x += p.vx;
+    p.y += p.vy;
+
+    const progress = age / p.lifespan;
+    const alpha = p.alpha * (1 - progress);
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(232, 164, 74, ${alpha})`;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.5})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  });
+
+  requestAnimationFrame(drawParticles);
+}
+
+resizeCanvas();
+createParticles();
+requestAnimationFrame(drawParticles);
+window.addEventListener('resize', () => { resizeCanvas(); createParticles(); });
+
+// --- SCROLL REVEAL ---
+const scenes = document.querySelectorAll('.scene');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      if (entry.target.id === 'scene-collection') {
+        const words = entry.target.querySelectorAll('.collected-word');
+        words.forEach(w => {
+          const delay = parseInt(w.dataset.delay) || 0;
+          setTimeout(() => w.classList.add('show'), delay);
+        });
+      }
+    }
+  });
+}, { threshold: 0.15 });
+
+scenes.forEach(s => observer.observe(s));
+
+// --- PROGRESS BAR ---
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = (window.scrollY / h) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// --- ETYMOLOGY CARDS ---
+document.querySelectorAll('.german-word').forEach(word => {
+  word.addEventListener('click', () => {
+    const cardId = 'card-' + word.dataset.card;
+    const card = document.getElementById(cardId);
+    if (card) {
+      const isOpen = card.classList.contains('open');
+      document.querySelectorAll('.ety-card.open').forEach(c => c.classList.remove('open'));
+      if (!isOpen) {
+        card.classList.add('open');
+        word.classList.add('revealed');
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
+    }
+  });
+});
+
+// --- GUESS INTERACTION ---
+function guess(btn, correct) {
+  const section = btn.closest('.guess-section');
+  const feedback = section.querySelector('.guess-feedback');
+  const allBtns = section.querySelectorAll('.guess-btn');
+
+  if (correct) {
+    btn.classList.add('correct');
+    allBtns.forEach(b => { if (b !== btn) b.classList.add('incorrect'); });
+    feedback.textContent = 'You have learned well. The language is becoming your own.';
+    feedback.classList.add('show');
+  } else {
+    btn.classList.add('incorrect');
+    btn.style.pointerEvents = 'none';
+    feedback.textContent = 'Not quite — think about the roots. You know this one.';
+    feedback.classList.add('show');
+  }
+}
+
+// --- MOBILE: prevent double-tap zoom on interactive elements ---
+document.querySelectorAll('.guess-btn, .german-word').forEach(el => {
+  el.addEventListener('touchend', e => { e.preventDefault(); el.click(); });
+});
+
+// --- MOBILE: reduce particle count on small screens ---
+if (window.innerWidth < 600) {
+  particles = particles.slice(0, Math.floor(particles.length / 2));
+}
+</script>
+
+</body>
+</html>

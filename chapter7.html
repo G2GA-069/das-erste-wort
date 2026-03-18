@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<title>The First Word — Chapter 7</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --parchment: #f4e8d8;
+    --ink: #1a1410;
+    --ink-dark: #0f0b08;
+    --wood: #6b4423;
+    --gold: #e8a44a;
+    --gold-light: #f4c67a;
+    --text: #d4cabb;
+    --text-bright: #efe8db;
+    --german: #e8a44a;
+    --chinese: #c49a6c;
+    --english: #8a9bae;
+    --pie: #9b8ec4;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: #1a1410;
+    background: var(--ink-dark);
+  }
+
+  body {
+    background: #1a1410;
+    background: var(--ink-dark);
+    color: #d4cabb;
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    font-size: 1.25rem;
+    line-height: 1.85;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* --- INK DROP CANVAS --- */
+  #inkCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* --- MAIN CONTENT --- */
+  .content {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 120px;
+  }
+
+  /* --- TITLE SCREEN --- */
+  .title-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .title-screen h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--text-bright);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.3em;
+    opacity: 0;
+    animation: fadeUp 2s ease 0.5s forwards;
+  }
+
+  .title-screen .subtitle {
+    font-size: 1.3rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--gold);
+    opacity: 0;
+    animation: fadeUp 2s ease 1.2s forwards;
+    margin-bottom: 2em;
+  }
+
+  .title-screen .chapter-label {
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(212, 202, 187, 0.4);
+    opacity: 0;
+    animation: fadeUp 2s ease 0.2s forwards;
+    margin-bottom: 0.5em;
+  }
+
+  .scroll-hint {
+    opacity: 0;
+    animation: fadeUp 2s ease 2s forwards;
+    color: rgba(212, 202, 187, 0.3);
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    margin-top: 3em;
+  }
+
+  .scroll-hint span {
+    display: inline-block;
+    animation: bob 2s ease-in-out infinite;
+  }
+
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- SCENES --- */
+  .scene {
+    margin-bottom: 80px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .scene.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scene-marker {
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin: 0 auto 40px;
+  }
+
+  /* --- NARRATIVE TEXT --- */
+  .narrative {
+    font-size: 1.25rem;
+    line-height: 1.9;
+    margin-bottom: 1.5em;
+    color: var(--text);
+  }
+
+  .narrative.emphasis {
+    font-size: 1.35rem;
+    color: var(--text-bright);
+    text-align: center;
+    font-style: italic;
+    margin: 2em 0;
+  }
+
+  .narrative.small {
+    font-size: 1.05rem;
+    color: rgba(212, 202, 187, 0.6);
+    line-height: 1.7;
+  }
+
+  /* --- GERMAN WORDS --- */
+  .german-word {
+    color: var(--german);
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 1px dotted rgba(232, 164, 74, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .german-word:hover {
+    color: var(--gold-light);
+    border-bottom-color: var(--gold-light);
+  }
+
+  .german-word.revealed {
+    border-bottom-color: transparent;
+  }
+
+  /* --- ETYMOLOGY CARDS --- */
+  .ety-card {
+    background: linear-gradient(135deg, rgba(26, 35, 55, 0.95), rgba(15, 20, 35, 0.95));
+    border: 1px solid rgba(232, 164, 74, 0.15);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 24px 0 32px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.6s ease, opacity 0.5s ease, padding 0.5s ease, margin 0.5s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(232, 164, 74, 0.08);
+  }
+
+  .ety-card.open {
+    max-height: 900px;
+    opacity: 1;
+    padding: 28px 32px;
+    margin: 24px 0 32px;
+  }
+
+  .ety-card .word-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .ety-card .word-main {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--german);
+  }
+
+  .ety-card .word-pron {
+    font-size: 1rem;
+    color: rgba(212, 202, 187, 0.5);
+    font-style: italic;
+  }
+
+  .ety-card .word-meaning {
+    font-size: 1.1rem;
+    color: var(--text-bright);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(232, 164, 74, 0.1);
+  }
+
+  .ety-card .bridge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0;
+    font-size: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .bridge-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Noto Serif', serif;
+    min-width: 55px;
+    text-align: center;
+  }
+
+  .bridge-label.pie { background: rgba(155, 142, 196, 0.15); color: var(--pie); }
+  .bridge-label.eng { background: rgba(138, 155, 174, 0.15); color: var(--english); }
+  .bridge-label.deu { background: rgba(232, 164, 74, 0.15); color: var(--german); }
+  .bridge-label.zho { background: rgba(196, 154, 108, 0.15); color: var(--chinese); }
+
+  .bridge-word {
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--text-bright);
+  }
+
+  .bridge-word.zh {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .bridge-note {
+    font-size: 0.9rem;
+    color: rgba(212, 202, 187, 0.5);
+    font-style: italic;
+  }
+
+  .ety-card .story {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(232, 164, 74, 0.1);
+    font-size: 1rem;
+    color: rgba(212, 202, 187, 0.75);
+    line-height: 1.7;
+  }
+
+  /* --- CHINESE CHARACTER DISPLAY --- */
+  .char-display {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(196, 154, 108, 0.08);
+    border: 1px solid rgba(196, 154, 108, 0.15);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 4px 8px;
+    vertical-align: middle;
+  }
+
+  .char-display .char {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 2.2rem;
+    color: var(--chinese);
+    line-height: 1.2;
+  }
+
+  .char-display .pinyin {
+    font-size: 0.8rem;
+    color: rgba(196, 154, 108, 0.7);
+    margin-top: 2px;
+  }
+
+  /* --- INTERACTIVE GUESS SECTIONS --- */
+  .guess-section {
+    background: linear-gradient(135deg, rgba(20, 28, 45, 0.9), rgba(12, 16, 28, 0.9));
+    border: 1px solid rgba(232, 164, 74, 0.12);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 40px 0;
+    text-align: center;
+  }
+
+  .guess-section .prompt {
+    font-size: 1.15rem;
+    color: var(--text-bright);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .guess-options {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .guess-btn {
+    background: rgba(232, 164, 74, 0.08);
+    border: 1px solid rgba(232, 164, 74, 0.25);
+    color: var(--text-bright);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .guess-btn:hover {
+    background: rgba(232, 164, 74, 0.15);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+  }
+
+  .guess-btn.correct {
+    background: rgba(74, 180, 100, 0.15);
+    border-color: #4ab464;
+    color: #8ed69e;
+    pointer-events: none;
+  }
+
+  .guess-btn.incorrect {
+    background: rgba(180, 74, 74, 0.1);
+    border-color: rgba(180, 74, 74, 0.3);
+    color: rgba(212, 202, 187, 0.3);
+    pointer-events: none;
+  }
+
+  .guess-feedback {
+    font-size: 1rem;
+    margin-top: 12px;
+    min-height: 1.5em;
+    color: var(--gold-light);
+    font-style: italic;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .guess-feedback.show { opacity: 1; }
+
+  /* --- SECTION DIVIDERS --- */
+  .divider {
+    text-align: center;
+    margin: 60px 0;
+    color: rgba(232, 164, 74, 0.3);
+    font-size: 1.5rem;
+    letter-spacing: 0.5em;
+  }
+
+  /* --- ASIDE BOX --- */
+  .aside-box {
+    background: rgba(155, 142, 196, 0.06);
+    border-left: 2px solid rgba(155, 142, 196, 0.3);
+    padding: 20px 24px;
+    margin: 28px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(212, 202, 187, 0.8);
+  }
+
+  .aside-box .aside-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--pie);
+    margin-bottom: 8px;
+  }
+
+  /* --- WORD COLLECTION --- */
+  .word-collection {
+    background: linear-gradient(135deg, rgba(20, 28, 45, 0.95), rgba(10, 14, 26, 0.95));
+    border: 1px solid rgba(232, 164, 74, 0.12);
+    border-radius: 16px;
+    padding: 40px 32px;
+    margin: 60px 0;
+    text-align: center;
+  }
+
+  .word-collection h3 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: rgba(232, 164, 74, 0.5);
+    margin-bottom: 24px;
+  }
+
+  .collected-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .collected-word {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(232, 164, 74, 0.06);
+    border: 1px solid rgba(232, 164, 74, 0.15);
+    border-radius: 10px;
+    padding: 14px 20px;
+    min-width: 90px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .collected-word.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .collected-word .cw-german {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--german);
+  }
+
+  .collected-word .cw-english {
+    font-size: 0.8rem;
+    color: rgba(212, 202, 187, 0.4);
+    margin-top: 2px;
+  }
+
+  /* --- CHAPTER END --- */
+  .chapter-end {
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  .chapter-end .end-line {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0 auto 30px;
+    opacity: 0.4;
+  }
+
+  .chapter-end .next-chapter {
+    font-size: 1rem;
+    color: rgba(212, 202, 187, 0.4);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 40px;
+  }
+
+  /* --- PROGRESS BAR --- */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #8b5a2b, var(--gold), var(--gold-light));
+    z-index: 100;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+
+  /* Force readable size on all mobile */
+  @media (max-width: 768px) {
+    html { font-size: 16px !important; }
+    body { font-size: 18px !important; min-width: 0 !important; width: 100% !important; }
+    .content { max-width: 100% !important; width: 100% !important; }
+  }
+
+  /* --- RESPONSIVE / MOBILE --- */
+  @media (max-width: 600px) {
+    body { font-size: 18px !important; -webkit-text-size-adjust: 100%; }
+    .content { padding: 40px 16px 100px; }
+    .title-screen { min-height: 90vh; min-height: 90dvh; padding: 30px 16px; }
+    .title-screen h1 { font-size: 2.2rem; letter-spacing: 0.04em; }
+    .title-screen .subtitle { font-size: 1.15rem; }
+    .narrative { font-size: 1.1rem; line-height: 1.8; }
+    .narrative.emphasis { font-size: 1.2rem; }
+
+    .ety-card { padding: 20px 16px; border-radius: 10px; }
+    .ety-card .word-main { font-size: 1.6rem; }
+    .ety-card .bridge { gap: 8px; }
+    .bridge-label { font-size: 0.7rem; min-width: 45px; padding: 2px 6px; }
+    .bridge-word { font-size: 1.05rem; }
+    .bridge-note { font-size: 0.82rem; }
+    .ety-card .story { font-size: 0.95rem; }
+
+    .german-word { padding: 2px 0; }
+
+    .char-display { padding: 10px 16px; margin: 4px 4px; }
+    .char-display .char { font-size: 1.8rem; }
+
+    .guess-section { padding: 24px 16px; border-radius: 10px; }
+    .guess-options { gap: 10px; }
+    .guess-btn {
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .guess-feedback { font-size: 0.95rem; }
+
+    .aside-box { padding: 16px 18px; font-size: 0.98rem; }
+
+    .word-collection { padding: 28px 16px; }
+    .collected-words { gap: 8px; }
+    .collected-word { padding: 10px 14px; min-width: 80px; }
+    .collected-word .cw-german { font-size: 1.1rem; }
+
+    .scene { margin-bottom: 60px; }
+    .divider { margin: 40px 0; }
+    .scene-marker { height: 30px; margin-bottom: 30px; }
+  }
+
+  @media (max-width: 380px) {
+    .title-screen h1 { font-size: 1.9rem; }
+    .narrative { font-size: 1.05rem; }
+    .ety-card .word-main { font-size: 1.4rem; }
+    .guess-btn { padding: 12px 16px; font-size: 1.05rem; }
+    .collected-word { min-width: 70px; padding: 8px 10px; }
+  }
+
+  /* iOS safe areas */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    .content { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="inkCanvas"></canvas>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="content">
+
+  <!-- ==================== TITLE ==================== -->
+  <div class="title-screen">
+    <div class="chapter-label">Chapter Seven</div>
+    <h1>Die Druckerpresse</h1>
+    <div class="subtitle">The Printing Press</div>
+    <div class="scroll-hint"><span>↓</span></div>
+  </div>
+
+  <!-- ==================== SCENE 1: THE WORKSHOP ==================== -->
+  <div class="scene" id="scene1">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      The year is 1450. In the cathedral city of Mainz, on the Rhine, a man sits hunched over his workbench. His name is Johannes Gutenberg. He is not a monk. He is not a scholar. He is a goldsmith — someone trained to manipulate metal with precision, to imagine three-dimensional forms and bring them into being with hammer and chisel.
+    </p>
+
+    <p class="narrative">
+      And he is about to change the world.
+    </p>
+
+    <p class="narrative">
+      For a thousand years, books had been copied by hand. Each page was a labor of love and agony — the monk's back aching, his fingers stained with ink, the candlelight flickering as he worked through the night. To create a single <span class="german-word" data-card="buch">Buch</span> — a book — meant months of work. A monastery might contain a hundred books, representing decades of monastic dedication. A book was a treasure. A book was a weapon. A book was power.
+    </p>
+
+    <p class="narrative">
+      And books were scarce. Desperately scarce. Most people never saw one. Most people never would.
+    </p>
+
+    <p class="narrative emphasis">
+      Gutenberg changed that forever.
+    </p>
+
+    <!-- BUCH etymology card -->
+    <div class="ety-card" id="card-buch">
+      <div class="word-header">
+        <span class="word-main">Buch</span>
+        <span class="word-pron">/bʊx/</span>
+      </div>
+      <div class="word-meaning">book — the vessel that holds words and the worlds they contain</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*bhago-</span>
+        <span class="bridge-note">— possibly from a word meaning "birch tree"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">book</span>
+        <span class="bridge-note">— Old English "bōc"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Buch</span>
+        <span class="bridge-note">— the "ch" sound from the old voiced velar</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">书</span>
+        <span class="bridge-note">— shū — an ancient form showed a hand holding a bamboo scroll</span>
+      </div>
+      <div class="story">
+        "Buch" descends from an ancient Germanic word meaning beech tree — and here is the mystery: why would a tree become the word for book? The answer lies in the earliest Germanic cultures. Before paper, before parchment, Germanic peoples wrote on beech bark and wooden tablets. The wood of the beech tree was ideal for inscribing with a stylus. So the word for the tree became the word for the surface, which became the word for any written work. The German "Buch" is a fossil record of a pre-literate people learning to write.
+      </div>
+    </div>
+
+    <p class="narrative">
+      This is how Gutenberg thought. He was a man trained to see the invisible inside the material. He saw that if you could carve individual letters into metal — tiny, precise, movable pieces — you could arrange them, ink them, and press them onto paper. Then you could rearrange them for the next page. And the next. And the next.
+    </p>
+
+    <p class="narrative">
+      The <span class="german-word" data-card="buchstabe">Buchstabe</span> — the individual letter — was already a thing. The word itself contained the secret. It meant, literally, the "beech-staff" — the small wooden rod used to carve letters into bark. But what if you carved it the other way? What if each letter was its own small tool, its own miniature stamp? What if you could move them like pieces on a board?
+    </p>
+
+    <!-- BUCHSTABE etymology card -->
+    <div class="ety-card" id="card-buchstabe">
+      <div class="word-header">
+        <span class="word-main">Buchstabe</span>
+        <span class="word-pron">/ˈbuːxˌstaːbə/</span>
+      </div>
+      <div class="word-meaning">letter / character — the individual building block of writing</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Buch + Stab</span>
+        <span class="bridge-note">— beech + staff/stick — what you carved with in the beginning</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">character</span>
+        <span class="bridge-note">— from Greek "charakter" (engraved mark)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">字</span>
+        <span class="bridge-note">— zì — a character that evolved from pictographs to the abstract forms we see today</span>
+      </div>
+      <div class="story">
+        "Buchstabe" is a compound word that tells its own history: Buch (beech/book) + Stab (staff/stick). It literally means "beech-staff," referring to the wooden stylus used to carve runes and letters into bark. When Gutenberg invented movable type, he was giving new life to an ancient idea. Each letter was now its own tiny "Buchstabe" — a small staff that could be picked up, arranged, inked, and pressed. The word had traveled from the stone age of Germanic writing straight into the age of print, unchanged.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 2: THE MACHINE ==================== -->
+  <div class="scene" id="scene2">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      The press itself was simple — a wooden frame, a metal plate, a lever. But it worked. Oh, how it worked. What had taken a monk three months to copy by hand could now be produced in a day. A hundred copies. A thousand. Suddenly, books were not scarce. Suddenly, books were everywhere.
+    </p>
+
+    <p class="narrative">
+      This is the word that captures what happens when you use the press: <span class="german-word" data-card="druck">Druck.</span> To print. Or more literally, to press. You already know this word from English, though you might not recognize it: <em>pressure.</em> The Romance languages called printing "printing" — from Latin <em>prīmere</em> (to press). But German, faithful to its Germanic roots, kept the Germanic word. The same root that gave English "press" and "pressure" gives German <em>Druck</em> — the fundamental act of pushing something into something else.
+    </p>
+
+    <!-- DRUCK etymology card -->
+    <div class="ety-card" id="card-druck">
+      <div class="word-header">
+        <span class="word-main">Druck</span>
+        <span class="word-pron">/dʁʊk/</span>
+      </div>
+      <div class="word-meaning">print / pressure — the force that leaves its mark on the world</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*dʰreugh-</span>
+        <span class="bridge-note">— to press, push, or drive</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">pressure, press</span>
+        <span class="bridge-note">— came through Old Norse and French influence</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Druck</span>
+        <span class="bridge-note">— the pure Germanic form, unchanged since Middle High German</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">印刷</span>
+        <span class="bridge-note">— yìnshuā — India (印) + printing (刷) — noting that printing came from India/Asia to China centuries before Europe</span>
+      </div>
+      <div class="story">
+        Here is a beautiful historical irony: Gutenberg is celebrated as the inventor of the printing press in 1450. But China had invented printing over a thousand years earlier. The technologies were different — Chinese woodblock printing versus Gutenberg's movable metal type — but the principle was identical: pressing inked surfaces onto paper to create multiple copies. Europe thinks of printing as its own discovery, but the technology had already traveled the Silk Road, changed China forever, and created a revolution in knowledge centuries before Gutenberg was born.
+      </div>
+    </div>
+
+    <p class="narrative">
+      And it is here, in this moment, that language becomes the crucial character in our story. Because a tool is just a tool. A press is just a machine. But what Gutenberg used it for — what would happen next — required something more.
+    </p>
+
+    <p class="narrative">
+      It required a man who would use this machine to give the German language to the people.
+    </p>
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 3: LUTHER & THE REFORMATION ==================== -->
+  <div class="scene" id="scene3">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      Eighty years after Gutenberg's first press, a man walked into a cathedral in Wittenberg and nailed ninety-five statements to the door. His name was Martin Luther. He was not a printer. He was a monk, a professor, a theologian. But he understood something crucial: if you wanted to change the world, you had to change what people could read.
+    </p>
+
+    <p class="narrative">
+      In Luther's time, the <span class="german-word" data-card="sprache">Sprache</span> of the Church was Latin. Every mass was in Latin. Every holy book was in Latin. Every educated man — and almost no women — learned Latin, while the common people were locked out of the sacred texts. They could only listen. They could only obey. They could not read the word of God for themselves.
+    </p>
+
+    <!-- SPRACHE etymology card -->
+    <div class="ety-card" id="card-sprache">
+      <div class="word-header">
+        <span class="word-main">Sprache</span>
+        <span class="word-pron">/ˈʃpʁaːxə/</span>
+      </div>
+      <div class="word-meaning">language / speech — the medium that makes thought visible</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">sprechen</span>
+        <span class="bridge-note">— to speak — Sprache comes from the verb</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">speech</span>
+        <span class="bridge-note">— the Germanic root *sprek- means to utter, speak, or make a sound</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">语言</span>
+        <span class="bridge-note">— yǔyán — language (speech + words) — composed elements, not a single abstract root</span>
+      </div>
+      <div class="story">
+        "Sprache" comes from the verb "sprechen" (to speak). It is the noun form of the act of speaking — the thing that emerges when we use our voice to make meaning. German has a wonderful habit of building nouns from verbs this way, creating a direct connection between the action and the thing. In the age of Luther, "Sprache" suddenly became crucial, because what people spoke and what they could read were finally becoming the same.
+      </div>
+    </div>
+
+    <p class="narrative">
+      Luther decided to do something radical. He would translate the Bible into German — not the German of scholars, but the German of common people. The German that merchants and servants and farmers actually spoke. He would print it on Gutenberg's presses. And he would give the word of God directly to the people.
+    </p>
+
+    <p class="narrative">
+      This was revolutionary. This was dangerous. This was the Reformation. And it changed the meaning of a word we have not yet spoken.
+    </p>
+  </div>
+
+  <!-- ==================== INTERACTIVE: GUESS 1 ==================== -->
+  <div class="scene" id="scene-guess1">
+    <div class="guess-section">
+      <div class="prompt">
+        Luther's great battle cry was about being able to choose your own path, to act according to your own conscience.<br><br>
+        What do you think <strong style="color: var(--german);">Freiheit</strong> means?<br>
+        <span style="font-size: 0.9rem; opacity: 0.5;">(Hint: it's what Luther fought for.)</span>
+      </div>
+      <div class="guess-options">
+        <button class="guess-btn" onclick="guess(this, false)">truth</button>
+        <button class="guess-btn" onclick="guess(this, true)">freedom</button>
+        <button class="guess-btn" onclick="guess(this, false)">fear</button>
+      </div>
+      <div class="guess-feedback" id="feedback1"></div>
+    </div>
+  </div>
+
+  <div class="scene" id="scene4">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      <span class="german-word" data-card="freiheit">Freiheit.</span> Freedom. The state of being <em>frei</em> — free. But this word carries the weight of Luther's entire vision: the freedom to read for yourself, to think for yourself, to stand before God without an intermediary telling you what to believe.
+    </p>
+
+    <p class="narrative">
+      Before Luther, there was no standard German language. There were dozens of regional dialects — the Bavarian way of speaking was nearly incomprehensible to someone from the Rhineland. A merchant in Hamburg spoke almost a different language than a farmer in Stuttgart. When Luther translated the Bible, he had to make a choice: which German would he use? Which dialect would he privilege?
+    </p>
+
+    <p class="narrative">
+      He chose something that was partly diplomatic genius and partly luck. He used the German of the Saxon court — the German spoken in the eastern territories — because it represented a kind of middle ground, accessible to traders and traveling people. And because it was becoming the language of commerce and power.
+    </p>
+
+    <p class="narrative">
+      Luther's Bible was printed and distributed. People read it. They passed it around. They read it aloud to their families. And slowly, almost without anyone noticing, the dialects began to converge. Regional variations persisted, but the existence of a single printed text — a text that was authoritative, that was holy — created a gravitational center. Everyone wanted to read <em>the</em> German Bible. Everyone wanted to understand it. Everyone, gradually, began to speak more like the text.
+    </p>
+
+    <!-- FREIHEIT etymology card -->
+    <div class="ety-card" id="card-freiheit">
+      <div class="word-header">
+        <span class="word-main">Freiheit</span>
+        <span class="word-pron">/ˈfʁaɪ̯haɪ̯t/</span>
+      </div>
+      <div class="word-meaning">freedom — the fundamental right to choose your own path</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">frei + -heit</span>
+        <span class="bridge-note">— free + -ness (a Germanic suffix meaning state or condition)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">freedom</span>
+        <span class="bridge-note">— free + -dom (the English equivalent suffix)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">自由</span>
+        <span class="bridge-note">— zìyóu — self (自) + reason/cause (由) — freedom as acting from your own nature</span>
+      </div>
+      <div class="story">
+        "Freiheit" is a perfect example of how Germanic languages build meaning through compound forms and suffixes. "Frei" (free) + "-heit" (a suffix meaning state, condition, or quality, like English "-hood"). This gives the abstract noun. German can be very systematic this way — once you understand the pattern, you can see it everywhere: Schönheit (beauty), Wahrheit (truth), Weisheit (wisdom), Dankbarkeit (gratitude). Each is the adjective + "-heit," creating the abstract quality. Luther's insistence on freedom — Freiheit — literally meant the state or condition of being free. It was not freedom as an external right granted by a ruler, but as a fundamental condition of being human.
+      </div>
+    </div>
+
+    <p class="narrative">
+      This is a moment we must pause and recognize, Veronica. The German language you are learning — <em>the</em> German language, the standard form that makes you and a Berliner and a student in Vienna mutually comprehensible — did not exist before Luther. It was literally invented. Created. Crafted by a monk who wanted to make God's word accessible to everyone.
+    </p>
+
+    <p class="narrative emphasis">
+      You are learning a language that Martin Luther made.
+    </p>
+
+    <p class="narrative">
+      This is what printing made possible. This is what happened when technology met conviction. Luther could not have standardized German without the press. The press could not have distributed his vision without the genius of his translation. The combination was revolutionary. And the result was the modern German language.
+    </p>
+
+    <p class="narrative">
+      But the word <span class="german-word" data-card="glaube">Glaube</span> — the foundation of Luther's entire vision — had to be understood on its own terms.
+    </p>
+
+    <!-- GLAUBE etymology card -->
+    <div class="ety-card" id="card-glaube">
+      <div class="word-header">
+        <span class="word-main">Glaube</span>
+        <span class="word-pron">/ˈɡlaʊ̯bə/</span>
+      </div>
+      <div class="word-meaning">faith / belief — trust in something beyond proof</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">glauben</span>
+        <span class="bridge-note">— to believe, to trust — the verb from which the noun derives</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">believe</span>
+        <span class="bridge-note">— but note: English "belief" has a different etymology, though they converge in meaning</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">信</span>
+        <span class="bridge-note">— xìn — person (人) + words (言): faith as trusting what someone tells you</span>
+      </div>
+      <div class="story">
+        "Glaube" comes from a root meaning to believe, to trust, to hold something as true. Luther's famous phrase was "Hier stehe ich, Gott helfe mir" — "Here I stand, God help me" — but the crisis that led to that moment was one of pure faith. He had to believe that translating the Bible, printing it, and giving it to the people was the right thing to do, even when the authorities told him to stop. The Chinese character for faith (信) is even more poetic: it shows a person (人) next to words (言), suggesting that faith is what happens when you trust the words of another person.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 5: CONSCIENCE & TRUTH ==================== -->
+  <div class="scene" id="scene5">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      Luther was summoned to the Diet of Worms — not a gathering of invertebrates, but a formal assembly of the Holy Roman Emperor and his nobles. They demanded that he recant his heresies. They promised him mercy if he would simply take back his words, admit he was wrong, and return to the fold.
+    </p>
+
+    <p class="narrative">
+      Luther refused. And in his refusal, he spoke a word that would echo through the centuries:
+    </p>
+
+    <p class="narrative emphasis">
+      "Mein Gewissen."
+    </p>
+
+    <p class="narrative">
+      My conscience. <span class="german-word" data-card="gewissen">Gewissen</span> — the inner voice that tells you what is right, even when the world tells you that you are wrong.
+    </p>
+
+    <!-- GEWISSEN etymology card -->
+    <div class="ety-card" id="card-gewissen">
+      <div class="word-header">
+        <span class="word-main">Gewissen</span>
+        <span class="word-pron">/ɡəˈvɪsən/</span>
+      </div>
+      <div class="word-meaning">conscience — the internal compass that guides moral choice</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">wissen</span>
+        <span class="bridge-note">— to know — Gewissen is "to-know-ness," inner knowing</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">wisdom, wit</span>
+        <span class="bridge-note">— from the same root meaning "to know"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">良心</span>
+        <span class="bridge-note">— liángxīn — good (良) + heart (心): conscience as the goodness of the heart</span>
+      </div>
+      <div class="story">
+        "Gewissen" comes from "wissen" (to know) with the prefix "ge-" — it means literally "to-know-ness," or the state of knowing. But it is not knowing in the sense of facts and information. It is knowing in the deepest sense: the interior knowledge of right and wrong, the voice inside you that tells you the truth even when everyone else is wrong. This is what Luther claimed when he said "Mein Gewissen" — not "my opinion," but "my conscience," the deepest truth he could know.
+      </div>
+    </div>
+
+    <p class="narrative">
+      And this brings us to the final word of this chapter, the word that Luther was claiming to serve: <span class="german-word" data-card="wahrheit">Wahrheit.</span> Truth. Not the truth of authorities or rulers or even the Church, but truth itself — the reality of the world as it is, whether it offends power or not.
+    </p>
+
+    <!-- WAHRHEIT etymology card -->
+    <div class="ety-card" id="card-wahrheit">
+      <div class="word-header">
+        <span class="word-main">Wahrheit</span>
+        <span class="word-pron">/ˈvaːɐ̯haɪ̯t/</span>
+      </div>
+      <div class="word-meaning">truth — the correspondence between word and reality</div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">wahr</span>
+        <span class="bridge-note">— true, genuine — wahr + -heit = truth as a state of being</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">true, truce</span>
+        <span class="bridge-note">— the English cognate, meaning reliable, dependable</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">真理</span>
+        <span class="bridge-note">— zhēnlǐ — genuine (真) + principle/logic (理): truth as genuine principle</span>
+      </div>
+      <div class="story">
+        "Wahrheit" comes from "wahr" (true, genuine) — a word with ancient roots in the concept of something being worthy of trust, reliable, dependable. The suffix "-heit" makes it the abstract noun: the state or condition of being true. When Luther demanded Wahrheit, he was not demanding mere facts. He was demanding that reality itself — the way the world actually is — be honored above comfort, politics, or tradition.
+      </div>
+    </div>
+
+    <p class="narrative">
+      The printing press gave Luther a weapon. But it was his words — these German words, forged in the heat of conviction — that changed the world. And those words, printed and distributed, shaped the German language itself.
+    </p>
+  </div>
+
+  <!-- ==================== INTERACTIVE: GUESS 2 ==================== -->
+  <div class="scene" id="scene-guess2">
+    <div class="guess-section">
+      <div class="prompt">
+        Luther believed that everyone deserved access to knowledge, to language, to understanding.<br><br>
+        What do you think <strong style="color: var(--german);">Volk</strong> means?<br>
+        <span style="font-size: 0.9rem; opacity: 0.5;">(Hint: who Luther wanted to reach.)</span>
+      </div>
+      <div class="guess-options">
+        <button class="guess-btn" onclick="guess(this, false)">voice</button>
+        <button class="guess-btn" onclick="guess(this, true)">people</button>
+        <button class="guess-btn" onclick="guess(this, false)">power</button>
+      </div>
+      <div class="guess-feedback" id="feedback2"></div>
+    </div>
+  </div>
+
+  <div class="scene" id="scene6">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      <span class="german-word" data-card="volk">Volk.</span> People. The common folk, the ordinary masses, the ones who did not have Latin and could not read the Church's books. Luther wrote for the <em>Volk</em>. He believed they deserved to understand scripture in their own <em>Sprache</em> — their own language. Not the language of priests. Not the language of Rome. But their language.
+    </p>
+
+    <!-- VOLK etymology card -->
+    <div class="ety-card" id="card-volk">
+      <div class="word-header">
+        <span class="word-main">Volk</span>
+        <span class="word-pron">/fɔlk/</span>
+      </div>
+      <div class="word-meaning">people / folk — the community of ordinary men and women who make up a culture</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*plek-</span>
+        <span class="bridge-note">— to fold, multiply — people as a multiplicity</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">folk</span>
+        <span class="bridge-note">— Old English "folc" — the same word, identical in meaning</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Volk</span>
+        <span class="bridge-note">— German V pronounced as F, so "Volk" sounds like "folk"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">民</span>
+        <span class="bridge-note">— mín — the common people, the nation — a simpler but equally powerful concept</span>
+      </div>
+      <div class="story">
+        "Volk" is nearly identical to English "folk," a reminder of how closely German and English are related. Both come from the same root meaning "to multiply" or "to fold" — the idea of people as a multiplicity, a gathering. Luther's insistence on writing in the language of the Volk was revolutionary because it meant rejecting the Latin of the educated elite. It meant saying that the common people were worthy of direct access to sacred knowledge. The Volk deserved their own language, their own Buch, their own Wahrheit.
+      </div>
+    </div>
+
+    <p class="narrative">
+      And finally, there is one more word we must speak, the word that describes the act of encountering these printed pages: <span class="german-word" data-card="lesen">lesen.</span> To read. This word has traveled through the centuries with a beautiful double meaning.
+    </p>
+
+    <!-- LESEN etymology card -->
+    <div class="ety-card" id="card-lesen">
+      <div class="word-header">
+        <span class="word-main">lesen</span>
+        <span class="word-pron">/ˈleːzən/</span>
+      </div>
+      <div class="word-meaning">to read — to gather letters into meaning</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*leg-</span>
+        <span class="bridge-note">— to gather, collect, pick up</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">to glean, to collect</span>
+        <span class="bridge-note">— the older sense; "read" came later through different paths</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">lesen</span>
+        <span class="bridge-note">— to read, but originally "to gather" — letters gathered into words</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">读</span>
+        <span class="bridge-note">— dú — to read, with the radical 言 (yán, speech) at its core</span>
+      </div>
+      <div class="story">
+        "Lesen" has an ancient secret embedded in it. The root *leg- originally meant "to gather" or "to collect" — the same root that gave English "legal" (a collection of laws), "legacy" (a collection of things passed down), and "legume" (vegetables you pick and gather). To read in German was originally to gather — to gather scattered letters into meaning, to pick up words and assemble them into thought. This is a metaphor so old that most speakers of German have forgotten it. But it reveals something profound: reading was understood as an act of collection, of gathering disparate elements into a unified whole. When Luther printed his Bible, he was giving people the chance to gather meaning from the page directly, without a priest as intermediary.
+      </div>
+    </div>
+
+    <p class="narrative">
+      This is what the printing press made possible. This is what Luther achieved. Not just the ability to mass-produce books, though that mattered. Not just the existence of a standard German language, though that was revolutionary. But the democratization of the very act of meaning-making. Before Luther, if you wanted to know what God said, you had to go to a priest who had studied Latin. You had to listen to his interpretation. You had to trust his understanding.
+    </p>
+
+    <p class="narrative">
+      After Luther, you could pick up a book — a Buch — in your own language and read it yourself. You could gather the meaning directly from the page. You could form your own <em>Glaube</em>, follow your own <em>Gewissen</em>, pursue your own <em>Wahrheit</em>.
+    </p>
+
+    <p class="narrative emphasis">
+      The printing press did not just change how we reproduce texts. It changed who gets to make meaning.
+    </p>
+
+  </div>
+
+  <div class="divider">· · ·</div>
+
+  <!-- ==================== SCENE 7: THE LANGUAGE THAT EMERGES ==================== -->
+  <div class="scene" id="scene7">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      The standard German language was born in Luther's choice to write for the <em>Volk</em>. It grew through the act of printing. It crystallized when thousands of people began to read the same words on the same pages. Over generations, regional accents and dialects persisted — they do to this day — but beneath them emerged a common language. A shared written form. A <em>Sprache</em> that a merchant in the north and a farmer in the south could both recognize and understand.
+    </p>
+
+    <p class="narrative">
+      And this is why Veronica, you are learning <em>this</em> German and not a dozen others. You are learning the language that Martin Luther shaped. The language that emerged from the marriage of technology and conviction. The language that was made for the common people and then, through the alchemy of print and time, became the language of an entire nation.
+    </p>
+
+    <p class="narrative">
+      Eight hundred years of sound change and evolution — from Old High German through Middle High German to Modern German — all concentrated in a moment of choice. One monk. One printing press. One decision to write in the <em>Sprache</em> of the <em>Volk</em>. And the result was the German language as you know it.
+    </p>
+
+    <p class="narrative">
+      The ink drops fall like rain on the parchment. Each one is a letter. Each letter gathers with others to form a word. Each word gathers with others to form a thought. And a thousand copies of that thought spread across a continent, seeping into how people speak, think, and understand themselves.
+    </p>
+
+    <p class="narrative emphasis">
+      This is the power of the printed word.
+    </p>
+  </div>
+
+  <!-- ==================== WORD COLLECTION ==================== -->
+  <div class="scene" id="scene-collection">
+    <div class="word-collection">
+      <h3>Words Gathered in Chapter Seven</h3>
+      <div class="collected-words">
+        <div class="collected-word" data-delay="0"><span class="cw-german">Buch</span><span class="cw-english">book</span></div>
+        <div class="collected-word" data-delay="100"><span class="cw-german">Buchstabe</span><span class="cw-english">letter/character</span></div>
+        <div class="collected-word" data-delay="200"><span class="cw-german">Druck</span><span class="cw-english">print/pressure</span></div>
+        <div class="collected-word" data-delay="300"><span class="cw-german">Sprache</span><span class="cw-english">language</span></div>
+        <div class="collected-word" data-delay="400"><span class="cw-german">Freiheit</span><span class="cw-english">freedom</span></div>
+        <div class="collected-word" data-delay="500"><span class="cw-german">Glaube</span><span class="cw-english">faith/belief</span></div>
+        <div class="collected-word" data-delay="600"><span class="cw-german">Gewissen</span><span class="cw-english">conscience</span></div>
+        <div class="collected-word" data-delay="700"><span class="cw-german">Wahrheit</span><span class="cw-english">truth</span></div>
+        <div class="collected-word" data-delay="800"><span class="cw-german">Volk</span><span class="cw-english">people</span></div>
+        <div class="collected-word" data-delay="900"><span class="cw-german">lesen</span><span class="cw-english">to read</span></div>
+      </div>
+    </div>
+
+    <div class="aside-box" style="border-left-color: rgba(232, 164, 74, 0.3); margin-top: 32px;">
+      <div class="aside-title" style="color: var(--german);">Patterns Discovered</div>
+      <strong style="color: var(--text-bright);">German "V" = pronounced "F"</strong> — Volk sounds like "folk," Vater sounds like "fahter"<br>
+      <strong style="color: var(--text-bright);">Compound nouns reveal history</strong> — Buchstabe (beech-staff), Freiheit (free-ness), Wahrheit (true-ness)<br>
+      <strong style="color: var(--text-bright);">Verbs become nouns with "-heit" and "-keit"</strong> — sprechen (speak) → Sprache, glauben (believe) → Glaube, wissen (know) → Gewissen<br>
+      <strong style="color: var(--text-bright);">German words often preserve older meanings</strong> — "lesen" originally meant "to gather," German keeps what English abandoned<br>
+      <strong style="color: var(--text-bright);">Standard German was created, not found</strong> — It emerged from Luther's choice to write for the common people
+    </div>
+  </div>
+
+  <!-- ==================== CHAPTER END ==================== -->
+  <div class="scene" id="scene-end">
+    <div class="chapter-end">
+      <div class="end-line"></div>
+      <p class="narrative emphasis" style="margin-bottom: 0.5em;">
+        End of Chapter Seven
+      </p>
+      <p class="narrative small" style="text-align: center;">
+        Ten words. Ten stories. The printing press opens its pages, and the German language emerges from ink and faith.<br>
+        A monk and a machine become allies. A technology meets a vision. And a language is born.<br>
+        The Reformation has changed not just religion, but the very shape of human consciousness itself.
+      </p>
+      <div class="next-chapter">
+        Chapter Eight: The Romantics — where German begins to dream
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// --- INK DROP CANVAS ---
+const canvas = document.getElementById('inkCanvas');
+const ctx = canvas.getContext('2d');
+let drops = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function createDrops() {
+  drops = [];
+  const count = Math.floor((canvas.width * canvas.height) / 12000);
+  for (let i = 0; i < count; i++) {
+    drops.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: Math.random() * 0.8 + 0.2,
+      size: Math.random() * 2 + 0.5,
+      alpha: Math.random() * 0.3 + 0.05,
+      letter: Math.random() < 0.15 ? String.fromCharCode(65 + Math.floor(Math.random() * 26)) : null
+    });
+  }
+}
+
+function drawDrops(time) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drops.forEach(d => {
+    d.y += d.vy;
+    d.x += d.vx;
+
+    if (d.y > canvas.height) {
+      d.y = -5;
+      d.x = Math.random() * canvas.width;
+    }
+
+    ctx.fillStyle = `rgba(212, 202, 187, ${d.alpha})`;
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (d.letter) {
+      ctx.font = '12px Cormorant Garamond';
+      ctx.fillStyle = `rgba(232, 164, 74, ${d.alpha * 0.5})`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(d.letter, d.x, d.y);
+    }
+  });
+  requestAnimationFrame(drawDrops);
+}
+
+resizeCanvas();
+createDrops();
+requestAnimationFrame(drawDrops);
+window.addEventListener('resize', () => { resizeCanvas(); createDrops(); });
+
+// --- SCROLL REVEAL ---
+const scenes = document.querySelectorAll('.scene');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Animate collected words
+      if (entry.target.id === 'scene-collection') {
+        const words = entry.target.querySelectorAll('.collected-word');
+        words.forEach(w => {
+          const delay = parseInt(w.dataset.delay) || 0;
+          setTimeout(() => w.classList.add('show'), delay);
+        });
+      }
+    }
+  });
+}, { threshold: 0.15 });
+
+scenes.forEach(s => observer.observe(s));
+
+// --- PROGRESS BAR ---
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = (window.scrollY / h) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// --- ETYMOLOGY CARDS ---
+document.querySelectorAll('.german-word').forEach(word => {
+  word.addEventListener('click', () => {
+    const cardId = 'card-' + word.dataset.card;
+    const card = document.getElementById(cardId);
+    if (card) {
+      const isOpen = card.classList.contains('open');
+      document.querySelectorAll('.ety-card.open').forEach(c => c.classList.remove('open'));
+      if (!isOpen) {
+        card.classList.add('open');
+        word.classList.add('revealed');
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
+    }
+  });
+});
+
+// --- GUESS INTERACTION ---
+function guess(btn, correct) {
+  const section = btn.closest('.guess-section');
+  const feedback = section.querySelector('.guess-feedback');
+  const allBtns = section.querySelectorAll('.guess-btn');
+
+  if (correct) {
+    btn.classList.add('correct');
+    allBtns.forEach(b => { if (b !== btn) b.classList.add('incorrect'); });
+    feedback.textContent = 'Yes. Luther believed this was every human\'s right — to think freely, to read, to question.';
+    feedback.classList.add('show');
+  } else {
+    btn.classList.add('incorrect');
+    btn.style.pointerEvents = 'none';
+    feedback.textContent = 'Not quite. Think about what Luther was fighting for — the right of ordinary people to access knowledge.';
+    feedback.classList.add('show');
+  }
+}
+
+// --- MOBILE: prevent double-tap zoom on interactive elements ---
+document.querySelectorAll('.guess-btn, .german-word').forEach(el => {
+  el.addEventListener('touchend', e => { e.preventDefault(); el.click(); });
+});
+
+// --- MOBILE: reduce drops on small screens ---
+if (window.innerWidth < 600) {
+  drops = drops.slice(0, Math.floor(drops.length / 2));
+}
+</script>
+
+</body>
+</html>

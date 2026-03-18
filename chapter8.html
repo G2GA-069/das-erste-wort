@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<title>The First Word — Chapter 8</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --forest-deep: #1a2414;
+    --forest-mid: #2d3d1f;
+    --forest-light: #3a4f27;
+    --moonlight: #a8c5b8;
+    --amber: #d4a574;
+    --amber-glow: #e8b88d;
+    --night: #0f1310;
+    --text: #c4bbb0;
+    --text-bright: #ddd3c8;
+    --german: #d4a574;
+    --chinese: #c49a6c;
+    --english: #8a9bae;
+    --pie: #9b8ec4;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: #0f1310;
+    background: var(--night);
+  }
+
+  body {
+    background: #0f1310;
+    background: var(--night);
+    color: #c4bbb0;
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    font-size: 1.25rem;
+    line-height: 1.85;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 40px 100px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* --- CANVAS FIREFLIES --- */
+  canvas#fireflies {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* --- TITLE SCREEN --- */
+  .title-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+  }
+
+  .title-screen h1 {
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--amber);
+    letter-spacing: 0.06em;
+    opacity: 0;
+    animation: fadeUp 2s ease 0.4s forwards;
+    margin-bottom: 1em;
+  }
+
+  .title-screen .subtitle {
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: var(--moonlight);
+    opacity: 0;
+    animation: fadeUp 2s ease 0.8s forwards;
+    margin-bottom: 2em;
+  }
+
+  .title-screen .chapter-label {
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(212, 202, 187, 0.4);
+    opacity: 0;
+    animation: fadeUp 2s ease 0.2s forwards;
+    margin-bottom: 0.5em;
+  }
+
+  .scroll-hint {
+    opacity: 0;
+    animation: fadeUp 2s ease 2s forwards;
+    color: rgba(212, 202, 187, 0.3);
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    margin-top: 3em;
+  }
+
+  .scroll-hint span {
+    display: inline-block;
+    animation: bob 2s ease-in-out infinite;
+  }
+
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* --- SCENES --- */
+  .scene {
+    margin-bottom: 80px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .scene.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scene-marker {
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--amber), transparent);
+    margin: 0 auto 40px;
+  }
+
+  /* --- NARRATIVE TEXT --- */
+  .narrative {
+    font-size: 1.25rem;
+    line-height: 1.9;
+    margin-bottom: 1.5em;
+    color: var(--text);
+  }
+
+  .narrative.emphasis {
+    font-size: 1.35rem;
+    color: var(--text-bright);
+    text-align: center;
+    font-style: italic;
+    margin: 2em 0;
+  }
+
+  .narrative.small {
+    font-size: 1.05rem;
+    color: rgba(196, 187, 176, 0.6);
+    line-height: 1.7;
+  }
+
+  /* --- GERMAN WORDS --- */
+  .german-word {
+    color: var(--german);
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 1px dotted rgba(212, 165, 116, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .german-word:hover {
+    color: var(--amber-glow);
+    border-bottom-color: var(--amber-glow);
+  }
+
+  .german-word.revealed {
+    border-bottom-color: transparent;
+  }
+
+  /* --- ETYMOLOGY CARDS --- */
+  .ety-card {
+    background: linear-gradient(135deg, rgba(26, 35, 55, 0.95), rgba(15, 20, 35, 0.95));
+    border: 1px solid rgba(212, 165, 116, 0.15);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 24px 0 32px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.6s ease, opacity 0.5s ease, padding 0.5s ease, margin 0.5s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(212, 165, 116, 0.08);
+  }
+
+  .ety-card.open {
+    max-height: 900px;
+    opacity: 1;
+    padding: 28px 32px;
+    margin: 24px 0 32px;
+  }
+
+  .ety-card .word-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .ety-card .word-main {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--german);
+  }
+
+  .ety-card .word-pron {
+    font-size: 1rem;
+    color: rgba(212, 202, 187, 0.5);
+    font-style: italic;
+  }
+
+  .ety-card .word-meaning {
+    font-size: 1.1rem;
+    color: var(--text-bright);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(212, 165, 116, 0.1);
+  }
+
+  .ety-card .bridge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0;
+    font-size: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .bridge-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Noto Serif', serif;
+    min-width: 55px;
+    text-align: center;
+  }
+
+  .bridge-label.pie { background: rgba(155, 142, 196, 0.15); color: var(--pie); }
+  .bridge-label.eng { background: rgba(138, 155, 174, 0.15); color: var(--english); }
+  .bridge-label.deu { background: rgba(212, 165, 116, 0.15); color: var(--german); }
+  .bridge-label.zho { background: rgba(196, 154, 108, 0.15); color: var(--chinese); }
+
+  .bridge-word {
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--text-bright);
+  }
+
+  .bridge-word.zh {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .bridge-note {
+    font-size: 0.9rem;
+    color: rgba(212, 202, 187, 0.5);
+    font-style: italic;
+  }
+
+  .ety-card .story {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(212, 165, 116, 0.1);
+    font-size: 1rem;
+    color: rgba(212, 202, 187, 0.75);
+    line-height: 1.7;
+  }
+
+  /* --- CHINESE CHARACTER DISPLAY --- */
+  .char-display {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(196, 154, 108, 0.08);
+    border: 1px solid rgba(196, 154, 108, 0.15);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 4px 8px;
+    vertical-align: middle;
+  }
+
+  .char-display .char {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 2.2rem;
+    color: var(--chinese);
+    line-height: 1.2;
+  }
+
+  .char-display .pinyin {
+    font-size: 0.8rem;
+    color: rgba(196, 154, 108, 0.7);
+    margin-top: 2px;
+  }
+
+  /* --- INTERACTIVE GUESS SECTIONS --- */
+  .guess-section {
+    background: linear-gradient(135deg, rgba(20, 28, 45, 0.9), rgba(12, 16, 28, 0.9));
+    border: 1px solid rgba(212, 165, 116, 0.12);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 40px 0;
+    text-align: center;
+  }
+
+  .guess-section .prompt {
+    font-size: 1.15rem;
+    color: var(--text-bright);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .guess-options {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .guess-btn {
+    background: rgba(212, 165, 116, 0.08);
+    border: 1px solid rgba(212, 165, 116, 0.25);
+    color: var(--text-bright);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .guess-btn:hover {
+    background: rgba(212, 165, 116, 0.15);
+    border-color: var(--amber);
+    transform: translateY(-2px);
+  }
+
+  .guess-btn.correct {
+    background: rgba(74, 180, 100, 0.15);
+    border-color: #4ab464;
+    color: #8ed69e;
+    pointer-events: none;
+  }
+
+  .guess-btn.incorrect {
+    background: rgba(180, 74, 74, 0.1);
+    border-color: rgba(180, 74, 74, 0.3);
+    color: rgba(212, 202, 187, 0.3);
+    pointer-events: none;
+  }
+
+  .guess-feedback {
+    font-size: 1rem;
+    margin-top: 12px;
+    min-height: 1.5em;
+    color: var(--amber-glow);
+    font-style: italic;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .guess-feedback.show { opacity: 1; }
+
+  /* --- SECTION DIVIDERS --- */
+  .divider {
+    text-align: center;
+    margin: 60px 0;
+    color: rgba(212, 165, 116, 0.3);
+    font-size: 1.5rem;
+    letter-spacing: 0.5em;
+  }
+
+  /* --- PATTERNS BOX --- */
+  .aside-box {
+    background: rgba(155, 142, 196, 0.06);
+    border-left: 2px solid rgba(155, 142, 196, 0.3);
+    padding: 20px 24px;
+    margin: 28px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(212, 202, 187, 0.8);
+  }
+
+  .aside-box .aside-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--pie);
+    margin-bottom: 8px;
+  }
+
+  /* --- WORD COLLECTION --- */
+  .word-collection {
+    background: linear-gradient(135deg, rgba(20, 28, 45, 0.95), rgba(10, 14, 26, 0.95));
+    border: 1px solid rgba(212, 165, 116, 0.12);
+    border-radius: 16px;
+    padding: 40px 32px;
+    margin: 60px 0;
+    text-align: center;
+  }
+
+  .word-collection h3 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: rgba(212, 165, 116, 0.5);
+    margin-bottom: 24px;
+  }
+
+  .collected-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .collected-word {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(212, 165, 116, 0.06);
+    border: 1px solid rgba(212, 165, 116, 0.15);
+    border-radius: 10px;
+    padding: 14px 20px;
+    min-width: 90px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .collected-word.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .collected-word .cw-german {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--german);
+  }
+
+  .collected-word .cw-english {
+    font-size: 0.8rem;
+    color: rgba(212, 202, 187, 0.4);
+    margin-top: 2px;
+  }
+
+  /* --- CHAPTER END --- */
+  .chapter-end {
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  .chapter-end .end-line {
+    width: 60px;
+    height: 1px;
+    background: var(--amber);
+    margin: 0 auto 30px;
+    opacity: 0.4;
+  }
+
+  .chapter-end .next-chapter {
+    font-size: 1rem;
+    color: rgba(212, 202, 187, 0.4);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 40px;
+  }
+
+  /* --- PROGRESS BAR --- */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--forest-light), var(--amber), var(--amber-glow));
+    z-index: 100;
+    transition: width 0.1s linear;
+    width: 0%;
+  }
+
+  /* Force readable size on all mobile */
+  @media (max-width: 768px) {
+    html { font-size: 16px !important; }
+    body { font-size: 18px !important; min-width: 0 !important; width: 100% !important; }
+    .content { max-width: 100% !important; width: 100% !important; }
+  }
+
+  /* --- RESPONSIVE / MOBILE --- */
+  @media (max-width: 600px) {
+    body { font-size: 18px !important; -webkit-text-size-adjust: 100%; }
+    .content { padding: 40px 16px 100px; }
+    .title-screen { min-height: 90vh; min-height: 90dvh; padding: 30px 16px; }
+    .title-screen h1 { font-size: 2.2rem; letter-spacing: 0.04em; }
+    .title-screen .subtitle { font-size: 1.15rem; }
+    .narrative { font-size: 1.1rem; line-height: 1.8; }
+    .narrative.emphasis { font-size: 1.2rem; }
+
+    .ety-card { padding: 20px 16px; border-radius: 10px; }
+    .ety-card .word-main { font-size: 1.6rem; }
+    .ety-card .bridge { gap: 8px; }
+    .bridge-label { font-size: 0.7rem; min-width: 45px; padding: 2px 6px; }
+    .bridge-word { font-size: 1.05rem; }
+    .bridge-note { font-size: 0.82rem; }
+    .ety-card .story { font-size: 0.95rem; }
+
+    .german-word { padding: 2px 0; }
+
+    .char-display { padding: 10px 16px; margin: 4px 4px; }
+    .char-display .char { font-size: 1.8rem; }
+
+    .guess-section { padding: 24px 16px; border-radius: 10px; }
+    .guess-options { gap: 10px; }
+    .guess-btn {
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .guess-feedback { font-size: 0.95rem; }
+
+    .aside-box { padding: 16px 18px; font-size: 0.98rem; }
+
+    .word-collection { padding: 28px 16px; }
+    .collected-words { gap: 8px; }
+    .collected-word { padding: 10px 14px; min-width: 80px; }
+    .collected-word .cw-german { font-size: 1.1rem; }
+
+    .scene { margin-bottom: 60px; }
+    .divider { margin: 40px 0; }
+    .scene-marker { height: 30px; margin-bottom: 30px; }
+  }
+
+  @media (max-width: 380px) {
+    .title-screen h1 { font-size: 1.9rem; }
+    .narrative { font-size: 1.05rem; }
+    .ety-card .word-main { font-size: 1.4rem; }
+    .guess-btn { padding: 12px 16px; font-size: 1.05rem; }
+    .collected-word { min-width: 70px; padding: 8px 10px; }
+  }
+
+  /* iOS safe areas */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    .content { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fireflies"></canvas>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="content">
+
+  <!-- ==================== TITLE ==================== -->
+  <div class="title-screen">
+    <div class="chapter-label">Chapter Eight</div>
+    <h1>Der Wanderer</h1>
+    <div class="subtitle">The Wanderer</div>
+    <div class="scroll-hint"><span>↓</span></div>
+  </div>
+
+  <!-- ==================== SCENE 1: THE FOREST EDGE ==================== -->
+  <div class="scene" id="scene1">
+    <div class="scene-marker"></div>
+
+    <p class="narrative">
+      It is 1795. The Enlightenment has declared that everything can be explained with reason. Chemistry. Physics. Mathematics. The human mind like a machine, ticking along predictable laws.
+    </p>
+
+    <p class="narrative">
+      But in Germany — in the forests, the villages, the candlelit rooms of Berlin and Heidelberg — something is happening. A revolution. Not of politics, but of feeling. A young poet named Goethe stands at the edge of a <span class="german-word" data-card="wald">Wald</span> and asks: How can reason explain the longing in my chest when I look at these ancient trees?
+    </p>
+
+    <p class="narrative">
+      The Romantics have arrived. And they speak a language that reason does not know.
+    </p>
+
+    <!-- WALD etymology card -->
+    <div class="ety-card" id="card-wald">
+      <div class="word-header">
+        <span class="word-main">Wald</span>
+        <span class="word-pron">/valt/</span>
+      </div>
+      <div class="word-meaning">forest — the sacred space where civilization ends and mystery begins</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*weldʰ-</span>
+        <span class="bridge-note">— to rule, to wield (the forest is powerful, untamed)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">weld, wild</span>
+        <span class="bridge-note">— Old English "wilde" — uncontrolled, unmanaged</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Wald</span>
+        <span class="bridge-note">— the Germanic path: deeply related to power and wilderness</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">森林</span>
+        <span class="bridge-note">— sēnlín — three trees (森) make a forest, two trees (林) make a wood</span>
+      </div>
+      <div class="story">
+        The PIE root *weldʰ- carries the sense of power, of something that cannot be controlled. A forest is not a garden — it is wild. In Old English and German, "wild" and "Wald" are cousins, sharing that same root. The Romantics loved this word. To them, the Wald represented everything that reason could not tame: mystery, danger, beauty, infinite depth. The Chinese character 森 (sēn) is more mathematical — it literally stacks trees to show density — but the German Wald carries a philosophical weight. A forest is not just many trees. It is a force of nature.
+      </div>
+    </div>
+
+    <p class="narrative">
+      And it is in the forest, the Romantics believed, that truth hides. Not in the salon or the university. Not in the light of reason. But in darkness, in silence, in the depths where no Enlightenment thinker dares to go.
+    </p>
+
+    <p class="narrative">
+      This is the era of <span class="german-word" data-card="maerchen">Märchen</span>.
+    </p>
+
+    <!-- MÄRCHEN etymology card -->
+    <div class="ety-card" id="card-maerchen">
+      <div class="word-header">
+        <span class="word-main">Märchen</span>
+        <span class="word-pron">/ˈmɛʁçən/</span>
+      </div>
+      <div class="word-meaning">fairy tale — the old stories that survived when empires fell</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*mer-</span>
+        <span class="bridge-note">— to rub, to wear away; by extension, to murmur, to speak</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">murmur</span>
+        <span class="bridge-note">— the word that came from Old High German "Mär" (news, rumor)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Märchen</span>
+        <span class="bridge-note">— from "Mär" + diminutive "-chen" = a little story, a tale</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">童话</span>
+        <span class="bridge-note">— tónghùa — child (童) + speech (话) — child-talk, child-story</span>
+      </div>
+      <div class="story">
+        The Märchen is not just any story. It is the tale that echoes from the oldest German folk traditions. The Grimm brothers — Jacob and Wilhelm — were not primarily collectors of pretty stories for children. They were <em>linguists</em>. They understood that in every Märchen, preserved in the mouths of old women and village storytellers, lived the oldest words of the German language, untouched by the neat grammar of the cities. A Märchen is a "Mär" — a piece of ancient speech — made small and precious with the suffix "-chen." When you say "Märchen," you are saying: a little piece of the oldest German, whispered by firelight.
+      </div>
+    </div>
+
+    <p class="narrative">
+      In 1812, the Grimm brothers published their <em>Kinder- und Hausmärchen</em> — Tales for Children and the Home. Cinderella. Snow White. Rapunzel. The stories everyone knows. But few know what these tales really are: vessels. Containers. Preservation jars for the language of the German folk, sealed and kept from the moment those ancient stories were born from the Wald itself.
+    </p>
+
+    <div class="divider">· · ·</div>
+
+    <p class="narrative">
+      A woman sits by a window in a high mountain valley. Outside, the Wald rises dark against the twilight. She closes her eyes and opens her mind to something the Enlightenment does not permit — the <span class="german-word" data-card="traum">Traum.</span>
+    </p>
+
+    <!-- TRAUM etymology card -->
+    <div class="ety-card" id="card-traum">
+      <div class="word-header">
+        <span class="word-main">Traum</span>
+        <span class="word-pron">/tʁaʊm/</span>
+      </div>
+      <div class="word-meaning">dream — the realm where reason has no power</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*dʰrewǵʰ-</span>
+        <span class="bridge-note">— to run, to flow, to waver</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">dream</span>
+        <span class="bridge-note">— Old English "drēam" originally meant joy, delight, music</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Traum</span>
+        <span class="bridge-note">— the language changed the meaning, but kept the ancient sound</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">梦</span>
+        <span class="bridge-note">— mèng — combines eye (目) + night (夕) — eyes in the darkness</span>
+      </div>
+      <div class="story">
+        Here is something beautiful: the Old English word "dream" did not mean what "dream" means today. In Anglo-Saxon, "drēam" meant <em>joy</em>, <em>pleasure</em>, <em>music</em>. The delight of sound. When the meaning changed over the centuries from "joy" to "sleeping vision," the Germans kept "Traum" but with a shift in sense. Yet both languages preserve something true: a dream is a wavering, a flowing of consciousness, like music flowing through the mind. The Chinese character 梦 is direct — eyes (目) in the night (夕) — showing exactly what happens when you dream. Three languages, three paths, all leading to the same human experience.
+      </div>
+    </div>
+
+    <p class="narrative">
+      The Romantics made the Traum sacred. If the Enlightenment valued reason, the Romantics valued dreams, intuition, the dark knowledge of the soul. Every Traum was a door into truth that reason could never reach.
+    </p>
+
+    <p class="narrative">
+      And in dreams, there was often <span class="german-word" data-card="stille">Stille.</span>
+    </p>
+
+    <!-- STILLE etymology card -->
+    <div class="ety-card" id="card-stille">
+      <div class="word-header">
+        <span class="word-main">Stille</span>
+        <span class="word-pron">/ˈʃtɪlə/</span>
+      </div>
+      <div class="word-meaning">silence, stillness — the pregnant absence from which all things emerge</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*stel-</span>
+        <span class="bridge-note">— to stand, to be fixed, to endure</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">still</span>
+        <span class="bridge-note">— Old English "stille" — not moving, tranquil</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Stille</span>
+        <span class="bridge-note">— the feminine noun form, suggesting depth and presence</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">静</span>
+        <span class="bridge-note">— jìng — contains a radical meaning "to watch, to observe" — silence that watches</span>
+      </div>
+      <div class="story">
+        The PIE root *stel- is about standing, about fixedness. When something is "still," it stands without moving. "Stille" in German is not merely the absence of sound — it is a presence. A quality. The Romantics understood this. In the Stille of the forest, in the Stille of the night, something speaks to the soul with more power than any words. The Chinese character 静 (jìng) carries something similar: it contains a radical suggesting observation, vigilance. Silence is not empty. It is alive, watching.
+      </div>
+    </div>
+
+    <p class="narrative">
+      In the Stille, something awakens.
+    </p>
+
+    <div class="divider">· · ·</div>
+
+    <p class="narrative">
+      A man stands at dawn in his native valley. He has lived in the city for years, learning, studying, becoming civilized. But he has returned. And now, looking at the familiar hills, at the church spire rising from the village, at the cottage where he was born — he feels something that cannot be explained.
+    </p>
+
+    <p class="narrative">
+      The Romantics had a word for this. They called it <span class="german-word" data-card="heimat">Heimat.</span>
+    </p>
+
+    <!-- HEIMAT etymology card -->
+    <div class="ety-card" id="card-heimat">
+      <div class="word-header">
+        <span class="word-main">Heimat</span>
+        <span class="word-pron">/ˈhaɪmat/</span>
+      </div>
+      <div class="word-meaning">homeland — not a nation, but a place where the soul recognizes itself</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*kóm-tis</span>
+        <span class="bridge-note">— related to "home" — the place where you dwell, belong</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">home</span>
+        <span class="bridge-note">— Old English "hām" — dwelling place, settlement</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Heimat</span>
+        <span class="bridge-note">— "Heim" (home) + "-at" suffix — the abstract essence of home</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">故乡</span>
+        <span class="bridge-note">— gùxiāng — old/former (故) + hometown (乡) — the place you come from</span>
+      </div>
+      <div class="story">
+        English has "home." German has "Heimat." The difference is profound. "Home" is where you live. "Heimat" is where you <em>belong</em>. It is the place that shaped you, that lives in your bones, that you can never quite escape even if you spend your whole life away. The suffix "-at" (like in Staat, Wirklichkeit) turns a noun into an abstract quality, an essence. Heimat is not a place on a map. It is an emotional and spiritual category. The Romantics were fascinated by Heimat because it could not be rationalized, could not be governed, could not be explained — it could only be felt. This is why Goethe never stopped writing about returning home.
+      </div>
+    </div>
+
+    <p class="narrative">
+      Heimat is what you feel when you stand in the place where you first learned the world. No other word in any language quite captures this. English tries with "homeland," but that is a political word. Spanish has "tierra natal" — native land — but that is merely fact. French has "patrie" — fatherland — but that is nationalist. Only Heimat holds the whole depth: the landscape, the history, the language, the childhood memories, the souls of the dead who lived there, the way the light falls in autumn. It is the place where you first became yourself.
+    </p>
+
+    <p class="narrative">
+      The Romantics believed that you could never truly leave your Heimat. It is written into your blood. It shapes how you see beauty, how you love, how you dream.
+    </p>
+
+    <div class="divider">· · ·</div>
+
+    <p class="narrative">
+      But sometimes — in the forest at twilight, or in a moment when a piece of music stops and the silence rushes in — something else happens. Something that cannot be explained by reason, cannot be captured by reason. Something that feels almost like magic.
+    </p>
+
+    <p class="narrative">
+      The Romantics called this <span class="german-word" data-card="wunder">Wunder.</span>
+    </p>
+
+    <!-- WUNDER etymology card -->
+    <div class="ety-card" id="card-wunder">
+      <div class="word-header">
+        <span class="word-main">Wunder</span>
+        <span class="word-pron">/ˈvʊndɐ/</span>
+      </div>
+      <div class="word-meaning">wonder, miracle — the inexplicable made manifest</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*wend-</span>
+        <span class="bridge-note">— to turn, to wind, to change direction</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">wonder</span>
+        <span class="bridge-note">— Old English "wundrian" — to think with amazement</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Wunder</span>
+        <span class="bridge-note">— the "W" is pronounced as English "V" — close kin to "wonder"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">奇迹</span>
+        <span class="bridge-note">— qījì — strange (奇) + trace/mark (迹) — something that leaves a strange mark</span>
+      </div>
+      <div class="story">
+        Wonder is a turning. Something that changes your direction, that makes you stop and reconsider everything you thought you knew. When you encounter a Wunder, you are turned from the path you were on. The PIE root *wend- means precisely this: to turn, to wind, to change. A wonder is an encounter with something that bends the world. The Romantics revived this word, making it central to their philosophy. They believed that the Wunder — the unexplainable, the miraculous — was actually more real than reason. It was the window into a deeper truth. The Chinese character 奇迹 is more specific: it means something that leaves a strange mark on the world, evidence of something beyond ordinary causation.
+      </div>
+    </div>
+
+    <p class="narrative">
+      And in a Wunder, there was often <span class="german-word" data-card="dunkel">dunkel</span> — darkness. The Romantics did not fear darkness as the Enlightenment did. They loved it.
+    </p>
+
+    <!-- DUNKEL etymology card -->
+    <div class="ety-card" id="card-dunkel">
+      <div class="word-header">
+        <span class="word-main">dunkel</span>
+        <span class="word-pron">/ˈdʊŋkəl/</span>
+      </div>
+      <div class="word-meaning">dark — where mystery dwells, where the soul can wander</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*dhewǵʰ-</span>
+        <span class="bridge-note">— to cloud, to obscure, to hide</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">dusk</span>
+        <span class="bridge-note">— Old English "dox" — the dimming of light</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">dunkel</span>
+        <span class="bridge-note">— the murmur of the "u" sound gives it depth</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">黑暗</span>
+        <span class="bridge-note">— hēi'àn — black (黑) + murky/gloomy (暗) — the fullness of darkness</span>
+      </div>
+      <div class="story">
+        The Romantics transformed the meaning of darkness. For centuries, Western culture had equated darkness with evil, ignorance, death. Light with good, knowledge, life. But the Romantics said: No. In darkness is mystery. In darkness is the soul's true home. They loved "dunkel" not because they wanted to deny reason, but because they wanted to honor what reason could not reach. The German "dunkel" has a different sound than English "dark" — it is rounder, more sonorous, almost musical. When you say "dunkel," you can almost hear the rustling of leaves in a forest at night.
+      </div>
+    </div>
+
+    <p class="narrative">
+      It is in the darkness that the soul speaks most clearly. And it speaks in <span class="german-word" data-card="lied">Lied</span> — the song.
+    </p>
+
+    <!-- LIED etymology card -->
+    <div class="ety-card" id="card-lied">
+      <div class="word-header">
+        <span class="word-main">Lied</span>
+        <span class="word-pron">/liːt/</span>
+      </div>
+      <div class="word-meaning">song — the voice of the soul made audible</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*lew-</span>
+        <span class="bridge-note">— to loosen, to cut; by extension, to separate into parts, to break into song</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">lay (archaic)</span>
+        <span class="bridge-note">— Old English "leod" — a song, a poem, a lay of verses</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Lied</span>
+        <span class="bridge-note">— the second vowel is long and open, like a voice rising</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">歌</span>
+        <span class="bridge-note">— gē — the character combines mouth (口) + phonetic element suggesting sound</span>
+      </div>
+      <div class="story">
+        The Lied is not just any song. It is specifically the German art-song tradition — the intimate marriage of voice and piano that Schubert, Schumann, Lied composers would perfect in the 19th century. The word "Lied" comes from the Old English "leod" (lay, poem) and the Germanic tradition of storytelling through song. When Franz Schubert composed his "Winterreise" — a cycle of 24 songs about a young man wandering through winter — he was creating a kind of Lied that did not exist before: the soul's soliloquy, externalized. The Romantics believed that the human voice, joined with music, could say things that no words alone could express. A Lied is language that has transcended language.
+      </div>
+    </div>
+
+    <div class="divider">· · ·</div>
+
+    <p class="narrative">
+      And what is this journey through the Wald, through darkness, through silence and dream and wonder? It is the journey of one who <span class="german-word" data-card="wandern">wandert</span> — one who wanders.
+    </p>
+
+    <!-- WANDERN etymology card -->
+    <div class="ety-card" id="card-wandern">
+      <div class="word-header">
+        <span class="word-main">wandern</span>
+        <span class="word-pron">/ˈvandɐn/</span>
+      </div>
+      <div class="word-meaning">to wander, to hike — the Romantic journey of the soul</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*wendʰ-</span>
+        <span class="bridge-note">— to turn, to proceed, to go (same as Wunder's root)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">wend</span>
+        <span class="bridge-note">— Old English "wendan" — to turn in a direction, to proceed</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">wandern</span>
+        <span class="bridge-note">— the root of "Wanderlust" from Chapter 6 — the hunger to wander</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">漫步</span>
+        <span class="bridge-note">— mànbù — leisurely (漫) + step (步) — a slow, purposeless walk</span>
+      </div>
+      <div class="story">
+        To "wandern" is not merely to walk. It is to move without a predetermined destination, to turn and turn again, following what calls to you. The English word "wend" (as in "wend one's way") comes from the same root. In Chapter 6, you encountered Wanderlust — the desire to wander. But now, in Chapter 8, you understand the deeper philosophy: wandering is not escape. It is a form of seeking. The Romantics made wandering sacred. To wander was to expose yourself to Wunder, to encounter the Heimat within yourself, to listen to the Stille. When Schubert composed "Winterreise," the protagonist is literally a wanderer (ein Wanderer) moving through a frozen landscape, and with each step, each Lied, he descends deeper into the soul.
+      </div>
+    </div>
+
+    <p class="narrative">
+      The word "Wanderer" is beautiful because it means both the person who walks and the person who turns. Who proceeds but without certainty. Who is lost but perhaps that is the point. Who seeks something they cannot name, but will recognize when they find it.
+    </p>
+
+    <div class="divider">· · ·</div>
+
+    <p class="narrative">
+      There is one final word. The deepest word. A word that the Romantics whispered to each other in those dark rooms where revolution was being prepared.
+    </p>
+
+    <p class="narrative">
+      <span class="german-word" data-card="geheimnis">Geheimnis.</span>
+    </p>
+
+    <!-- GEHEIMNIS etymology card -->
+    <div class="ety-card" id="card-geheimnis">
+      <div class="word-header">
+        <span class="word-main">Geheimnis</span>
+        <span class="word-pron">/ɡəˈhaɪmnɪs/</span>
+      </div>
+      <div class="word-meaning">secret, mystery — that which belongs to the home and shall not be revealed</div>
+      <div class="bridge">
+        <span class="bridge-label pie">PIE</span>
+        <span class="bridge-word">*kóm-tis</span>
+        <span class="bridge-note">— home (same root as Heimat, home)</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label eng">ENG</span>
+        <span class="bridge-word">home</span>
+        <span class="bridge-note">— English lost this word; German preserved it in "Geheimnis"</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label deu">DEU</span>
+        <span class="bridge-word">Geheimnis</span>
+        <span class="bridge-note">— "ge-" (collective prefix) + "Heimnis" (from "Heim") — a secret, that which is kept at home</span>
+      </div>
+      <div class="bridge">
+        <span class="bridge-label zho">ZHO</span>
+        <span class="bridge-word zh">秘密</span>
+        <span class="bridge-note">— mìmi — secret (秘) + dense/close (密) — something kept close and hidden</span>
+      </div>
+      <div class="story">
+        This is where German becomes almost untranslatable. A "Geheimnis" is not merely a secret that must be hidden. It is literally "that which is kept in the Heim" — in the home. What belongs to home is sacred, is private, is yours alone. The word contains philosophy: it says that there are things that should not be made public, should not be rationalized, should not be exposed to the light of common understanding. The Romantics understood this. In an age of Enlightenment that wanted to explain everything, they said: No. Some things must remain secret. Some truths are only true if they stay hidden in the Heim of the heart. The Chinese 秘密 (mìmi) carries a similar sense of closeness, of things kept tight and protected. A Geheimnis is not a lie. It is a truth too profound for words.
+      </div>
+    </div>
+
+    <p class="narrative">
+      A secret is something that belongs to the home. That lives in the heart. That cannot be translated into the cold language of reason.
+    </p>
+
+    <p class="narrative">
+      The Romantics understood that language itself was a kind of Geheimnis. That each word carried within it not just meaning, but feeling, history, soul. That German was not a mere tool for communication — it was a repository of ancient wisdom, preserved in words that had survived thousands of years.
+    </p>
+
+    <p class="narrative">
+      They were right.
+    </p>
+
+  </div>
+
+  <!-- ==================== INTERACTIVE: GUESS 1 ==================== -->
+  <div class="scene" id="scene-guess1">
+    <div class="guess-section">
+      <div class="prompt">
+        You have learned that the Romantics revived the old <strong style="color: var(--german);">Märchen</strong> — fairy tales from the folk.<br><br>
+        In 1812, who collected and published the most famous German fairy tales, preserving the oldest layer of the language?<br>
+        <span style="font-size: 0.9rem; opacity: 0.5;">(Hint: We mentioned them earlier in this chapter.)</span>
+      </div>
+      <div class="guess-options">
+        <button class="guess-btn" onclick="guess(this, false)">Johann Wolfgang von Goethe</button>
+        <button class="guess-btn" onclick="guess(this, true)">The Brothers Grimm</button>
+        <button class="guess-btn" onclick="guess(this, false)">Johann Sebastian Bach</button>
+        <button class="guess-btn" onclick="guess(this, false)">Ludwig van Beethoven</button>
+      </div>
+      <div class="guess-feedback" id="feedback1"></div>
+    </div>
+  </div>
+
+  <!-- ==================== INTERACTIVE: GUESS 2 ==================== -->
+  <div class="scene" id="scene-guess2">
+    <div class="guess-section">
+      <div class="prompt">
+        The Romantic composer Franz Schubert wrote a cycle of 24 songs called <strong style="color: var(--german);">"Winterreise"</strong> about a young man wandering through winter.<br><br>
+        What is the German word for this journey or wandering that you learned in this chapter?
+      </div>
+      <div class="guess-options">
+        <button class="guess-btn" onclick="guess(this, false)">Waldgang</button>
+        <button class="guess-btn" onclick="guess(this, true)">Wanderung</button>
+        <button class="guess-btn" onclick="guess(this, false)">Nachtfahrt</button>
+        <button class="guess-btn" onclick="guess(this, false)">Traumbahn</button>
+      </div>
+      <div class="guess-feedback" id="feedback2"></div>
+    </div>
+  </div>
+
+  <!-- ==================== WORD COLLECTION ==================== -->
+  <div class="scene" id="scene-collection">
+    <div class="word-collection">
+      <h3>Words Gathered in Chapter Eight</h3>
+      <div class="collected-words">
+        <div class="collected-word" data-delay="0"><span class="cw-german">Wald</span><span class="cw-english">forest</span></div>
+        <div class="collected-word" data-delay="100"><span class="cw-german">Märchen</span><span class="cw-english">fairy tale</span></div>
+        <div class="collected-word" data-delay="200"><span class="cw-german">Traum</span><span class="cw-english">dream</span></div>
+        <div class="collected-word" data-delay="300"><span class="cw-german">Stille</span><span class="cw-english">silence</span></div>
+        <div class="collected-word" data-delay="400"><span class="cw-german">Heimat</span><span class="cw-english">homeland</span></div>
+        <div class="collected-word" data-delay="500"><span class="cw-german">Wunder</span><span class="cw-english">wonder</span></div>
+        <div class="collected-word" data-delay="600"><span class="cw-german">dunkel</span><span class="cw-english">dark</span></div>
+        <div class="collected-word" data-delay="700"><span class="cw-german">Lied</span><span class="cw-english">song</span></div>
+        <div class="collected-word" data-delay="800"><span class="cw-german">wandern</span><span class="cw-english">to wander</span></div>
+        <div class="collected-word" data-delay="900"><span class="cw-german">Geheimnis</span><span class="cw-english">secret</span></div>
+      </div>
+    </div>
+
+    <div class="aside-box" style="border-left-color: rgba(155, 142, 196, 0.3); margin-top: 32px;">
+      <div class="aside-title" style="color: var(--pie);">Patterns Discovered</div>
+      <strong style="color: var(--text-bright);">German "W" = pronounced "V"</strong> — Wald sounds like "valt," Wunder like "vunder"<br>
+      <strong style="color: var(--text-bright);">German "ch" is the "gh" sound that English lost</strong> — Geheimnis has a soft, whispery ch<br>
+      <strong style="color: var(--text-bright);">Adjective endings shift with gender and case</strong> — "ein dunkler Wald" vs. "die dunkle Nacht"<br>
+      <strong style="color: var(--text-bright);">The Romantics revived medieval and folk German</strong> — preserving what reason tried to forget<br>
+      <strong style="color: var(--text-bright);">Each German word carries not just meaning but history and soul</strong> — language as preservation
+    </div>
+  </div>
+
+  <!-- ==================== CHAPTER END ==================== -->
+  <div class="scene" id="scene-end">
+    <div class="chapter-end">
+      <div class="end-line"></div>
+      <p class="narrative emphasis" style="margin-bottom: 0.5em;">
+        End of Chapter Eight
+      </p>
+      <p class="narrative small" style="text-align: center;">
+        Ten words from the Romantic era. Ten doors into a language that reason cannot explain.<br>
+        The Enlightenment is ending. The darkness has returned.<br>
+        And in that darkness, something is being born.
+      </p>
+      <div class="next-chapter">
+        Chapter Nine — coming soon
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// --- FIREFLIES CANVAS ---
+const canvas = document.getElementById('fireflies');
+const ctx = canvas.getContext('2d');
+let fireflies = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function createFireflies() {
+  fireflies = [];
+  const count = Math.floor((canvas.width * canvas.height) / 15000);
+  for (let i = 0; i < count; i++) {
+    fireflies.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 2 + 0.8,
+      alpha: Math.random() * 0.3 + 0.1,
+      pulseSpeed: Math.random() * 0.008 + 0.003,
+      pulseOffset: Math.random() * Math.PI * 2,
+      floatSpeed: Math.random() * 0.15 + 0.05,
+      floatAngle: Math.random() * Math.PI * 2,
+      vx: Math.cos(Math.random() * Math.PI * 2) * 0.3,
+      vy: (Math.random() - 0.5) * 0.4
+    });
+  }
+}
+
+function drawFireflies(time) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  fireflies.forEach(f => {
+    // Pulsing glow
+    const pulse = Math.sin(time * f.pulseSpeed + f.pulseOffset) * 0.25 + 0.45;
+    const alpha = Math.max(0.05, f.alpha + pulse);
+
+    // Slow drift
+    f.x += f.vx;
+    f.y += f.vy;
+
+    // Wrap around edges
+    if (f.x < 0) f.x = canvas.width;
+    if (f.x > canvas.width) f.x = 0;
+    if (f.y < 0) f.y = canvas.height;
+    if (f.y > canvas.height) f.y = 0;
+
+    // Draw glow
+    const gradient = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.radius * 8);
+    gradient.addColorStop(0, `rgba(212, 165, 116, ${alpha * 0.6})`);
+    gradient.addColorStop(1, `rgba(212, 165, 116, 0)`);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(f.x - f.radius * 8, f.y - f.radius * 8, f.radius * 16, f.radius * 16);
+
+    // Draw core
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(212, 165, 116, ${alpha})`;
+    ctx.fill();
+  });
+
+  requestAnimationFrame(drawFireflies);
+}
+
+resizeCanvas();
+createFireflies();
+requestAnimationFrame(drawFireflies);
+window.addEventListener('resize', () => { resizeCanvas(); createFireflies(); });
+
+// --- SCROLL REVEAL ---
+const scenes = document.querySelectorAll('.scene');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Animate collected words
+      if (entry.target.id === 'scene-collection') {
+        const words = entry.target.querySelectorAll('.collected-word');
+        words.forEach(w => {
+          const delay = parseInt(w.dataset.delay) || 0;
+          setTimeout(() => w.classList.add('show'), delay);
+        });
+      }
+    }
+  });
+}, { threshold: 0.15 });
+
+scenes.forEach(s => observer.observe(s));
+
+// --- PROGRESS BAR ---
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = (window.scrollY / h) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// --- ETYMOLOGY CARDS ---
+document.querySelectorAll('.german-word').forEach(word => {
+  word.addEventListener('click', () => {
+    const cardId = 'card-' + word.dataset.card;
+    const card = document.getElementById(cardId);
+    if (card) {
+      const isOpen = card.classList.contains('open');
+      // Close all cards first
+      document.querySelectorAll('.ety-card.open').forEach(c => c.classList.remove('open'));
+      // Toggle this one
+      if (!isOpen) {
+        card.classList.add('open');
+        word.classList.add('revealed');
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }
+    }
+  });
+});
+
+// --- GUESS INTERACTION ---
+function guess(btn, correct) {
+  const section = btn.closest('.guess-section');
+  const feedback = section.querySelector('.guess-feedback');
+  const allBtns = section.querySelectorAll('.guess-btn');
+
+  if (correct) {
+    btn.classList.add('correct');
+    allBtns.forEach(b => { if (b !== btn) b.classList.add('incorrect'); });
+    feedback.textContent = 'Precisely. The Romantics preserved what the age of reason wanted to forget.';
+    feedback.classList.add('show');
+  } else {
+    btn.classList.add('incorrect');
+    btn.style.pointerEvents = 'none';
+    feedback.textContent = 'Not quite. Listen to the etymology, the story...';
+    feedback.classList.add('show');
+  }
+}
+
+// --- MOBILE: prevent double-tap zoom on interactive elements ---
+document.querySelectorAll('.guess-btn, .german-word').forEach(el => {
+  el.addEventListener('touchend', e => { e.preventDefault(); el.click(); });
+});
+
+// --- MOBILE: reduce firefly count on small screens for performance ---
+if (window.innerWidth < 600) {
+  fireflies = fireflies.slice(0, Math.floor(fireflies.length / 2));
+}
+</script>
+
+</body>
+</html>
