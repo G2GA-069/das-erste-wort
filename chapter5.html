@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Das erste Wort - Chapter 5: Der Ritter und die Rose</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0e1020;
+            --primary-rose: #c47a7a;
+            --primary-purple: #8a6aaa;
+            --primary-gold: #d4a44a;
+            --primary-green: #4a7a5a;
+            --german: #e8a44a;
+            --chinese: #c49a6c;
+            --english: #8a9bae;
+            --text-light: #e8e8f0;
+            --text-muted: #a8a8b8;
+            --accent-1: #d4a44a;
+            --accent-2: #c47a7a;
+            --safe-top: env(safe-area-inset-top, 0);
+            --safe-bottom: env(safe-area-inset-bottom, 0);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0e1020 0%, #1a1530 50%, #0f1428 100%);
+            color: var(--text-light);
+            font-family: 'Cormorant Garamond', 'Noto Serif', serif;
+            line-height: 1.8;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Ambient particles - candlelight flicker effect */
+        .particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: radial-gradient(circle, #ffd700, transparent);
+            border-radius: 50%;
+            opacity: 0.3;
+            filter: blur(1px);
+        }
+
+        .particle.candlelight {
+            animation: flicker 3s infinite ease-in-out;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: calc(20px + var(--safe-top));
+            padding-bottom: calc(40px + var(--safe-bottom));
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--german), var(--primary-rose), var(--primary-purple));
+            width: 0%;
+            z-index: 999;
+            transition: width 0.3s ease;
+        }
+
+        /* Title screen */
+        .title-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 40px 20px;
+            padding-top: calc(60px + var(--safe-top));
+        }
+
+        .chapter-number {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--primary-gold);
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .title-main {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 700;
+            color: var(--primary-rose);
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(196, 122, 122, 0.3);
+            line-height: 1.2;
+        }
+
+        .title-subtitle {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            font-style: italic;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .title-context {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 50px;
+            line-height: 1.8;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-rose));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 5px 20px rgba(196, 122, 122, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(196, 122, 122, 0.4);
+        }
+
+        .cta-button:active {
+            transform: translateY(0);
+        }
+
+        /* Scene sections */
+        .scene {
+            margin-bottom: 80px;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scene:nth-child(2) { animation-delay: 0.2s; }
+        .scene:nth-child(3) { animation-delay: 0.4s; }
+        .scene:nth-child(4) { animation-delay: 0.6s; }
+        .scene:nth-child(5) { animation-delay: 0.8s; }
+
+        .scene-title {
+            font-size: 2.2rem;
+            color: var(--primary-purple);
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary-gold);
+            padding-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .scene-text {
+            font-size: 1.1rem;
+            line-height: 2;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+
+        /* German words with cards */
+        .german-word {
+            display: inline-block;
+            color: var(--german);
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            border-bottom: 2px dotted var(--german);
+            padding: 2px 4px;
+            transition: all 0.3s ease;
+        }
+
+        .german-word:hover {
+            text-shadow: 0 0 10px rgba(232, 164, 74, 0.3);
+        }
+
+        .german-word.active-card {
+            background: rgba(232, 164, 74, 0.15);
+            border-radius: 4px;
+        }
+
+        /* Etymology/translation cards */
+        .ety-card {
+            display: none;
+            background: rgba(138, 106, 170, 0.2);
+            border-left: 4px solid var(--primary-purple);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            backdrop-filter: blur(10px);
+        }
+
+        .ety-card.visible {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 500px; }
+        }
+
+        .ety-card-title {
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .ety-bridge {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 3px solid currentColor;
+            font-size: 0.95rem;
+        }
+
+        .ety-bridge.german { color: var(--german); }
+        .ety-bridge.chinese { color: var(--chinese); }
+        .ety-bridge.english { color: var(--english); }
+
+        .ety-text {
+            font-size: 0.95rem;
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        /* Aside boxes */
+        .aside-box {
+            background: rgba(74, 122, 90, 0.15);
+            border-left: 4px solid var(--primary-green);
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+            backdrop-filter: blur(10px);
+        }
+
+        .aside-title {
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .aside-text {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text-light);
+        }
+
+        /* Dividers */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-gold), transparent);
+            margin: 60px 0;
+            opacity: 0.5;
+        }
+
+        /* Guess sections */
+        .guess-section {
+            background: rgba(196, 122, 122, 0.15);
+            border: 2px solid var(--primary-rose);
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .guess-title {
+            font-size: 1.4rem;
+            color: var(--primary-rose);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .guess-prompt {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .guess-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .guess-option {
+            padding: 15px 20px;
+            background: rgba(232, 164, 74, 0.1);
+            border: 2px solid var(--primary-gold);
+            border-radius: 4px;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .guess-option:hover {
+            background: rgba(232, 164, 74, 0.2);
+            transform: translateX(5px);
+        }
+
+        .guess-option.correct {
+            background: rgba(74, 122, 90, 0.3);
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .guess-option.incorrect {
+            background: rgba(196, 122, 122, 0.3);
+            border-color: var(--primary-rose);
+            opacity: 0.6;
+        }
+
+        .guess-feedback {
+            padding: 15px;
+            background: rgba(74, 122, 90, 0.2);
+            border-left: 4px solid var(--primary-green);
+            border-radius: 4px;
+            color: var(--primary-green);
+            margin-top: 20px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .guess-feedback.visible {
+            display: block;
+        }
+
+        /* Word collection */
+        .word-collection {
+            margin: 40px 0;
+        }
+
+        .collection-title {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .word-card {
+            background: rgba(138, 106, 170, 0.15);
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--primary-purple);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .word-card:hover {
+            background: rgba(138, 106, 170, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .word-de {
+            color: var(--german);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .word-en {
+            color: var(--english);
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .word-zh {
+            color: var(--chinese);
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        /* Insights section */
+        .insights-section {
+            background: linear-gradient(135deg, rgba(212, 164, 74, 0.1), rgba(196, 122, 122, 0.1));
+            padding: 40px;
+            border-radius: 8px;
+            margin: 40px 0;
+            border: 1px solid var(--primary-gold);
+        }
+
+        .insights-title {
+            font-size: 1.6rem;
+            color: var(--primary-gold);
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .insight-item {
+            margin-bottom: 25px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .insight-item:before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: var(--primary-gold);
+            font-size: 1.2rem;
+        }
+
+        .insight-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-light);
+        }
+
+        /* Teaser section */
+        .teaser-section {
+            background: rgba(138, 106, 170, 0.2);
+            padding: 40px;
+            border-radius: 8px;
+            border: 2px solid var(--primary-purple);
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .teaser-title {
+            font-size: 1.4rem;
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .teaser-text {
+            font-size: 1.05rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            line-height: 1.8;
+            font-style: italic;
+        }
+
+        .teaser-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: rgba(138, 106, 170, 0.5);
+            border: 2px solid var(--primary-purple);
+            color: var(--primary-purple);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .teaser-button:hover {
+            background: var(--primary-purple);
+            color: white;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                padding-top: calc(15px + var(--safe-top));
+            }
+
+            .title-main {
+                font-size: clamp(1.8rem, 6vw, 3rem);
+            }
+
+            .scene-title {
+                font-size: 1.6rem;
+            }
+
+            .scene-text {
+                font-size: 1rem;
+            }
+
+            .word-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .guess-section {
+                padding: 20px;
+            }
+
+            .insights-section {
+                padding: 25px;
+            }
+
+            .teaser-section {
+                padding: 25px;
+            }
+
+            .particle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .title-main {
+                font-size: clamp(1.5rem, 5vw, 2.2rem);
+            }
+
+            .title-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .scene-title {
+                font-size: 1.3rem;
+            }
+
+            .scene-text {
+                font-size: 0.95rem;
+                line-height: 1.7;
+            }
+
+            .cta-button {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+
+            .word-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .guess-section {
+                padding: 18px;
+            }
+
+            .ety-card {
+                padding: 15px;
+            }
+
+            .aside-box {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .title-main {
+                font-size: 1.3rem;
+            }
+
+            .title-subtitle {
+                font-size: 0.95rem;
+                margin-bottom: 25px;
+            }
+
+            .scene-text {
+                font-size: 0.9rem;
+                line-height: 1.6;
+            }
+
+            .cta-button {
+                padding: 10px 25px;
+                font-size: 0.9rem;
+            }
+
+            .divider {
+                margin: 40px 0;
+            }
+        }
+
+        /* Hide title screen when started */
+        .content {
+            display: none;
+        }
+
+        .content.visible {
+            display: block;
+        }
+
+        .title-screen.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar"></div>
+
+    <div class="particles" id="particles"></div>
+
+    <!-- TITLE SCREEN -->
+    <div class="title-screen" id="titleScreen">
+        <div class="chapter-number">Kapitel 5</div>
+        <h1 class="title-main">Der Ritter und die Rose</h1>
+        <p class="title-subtitle">The Knight and the Rose</p>
+        <p class="title-context">
+            The year is 1150. Europe is changing. The Crusades have opened new horizons, and French culture floods into the Germanic kingdoms.
+            At the Wartburg Castle in Thuringia, a tournament draws nobility and singers. A knight arrives seeking love, honor, and meaning
+            in an age of courtly ideals—and in doing so, discovers something far more precious.
+        </p>
+        <button class="cta-button" id="startBtn">Begin</button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content" id="mainContent">
+        <div class="container">
+
+            <!-- SCENE 1: THE TOURNAMENT -->
+            <div class="scene">
+                <h2 class="scene-title">Szene 1: Das Turnier</h2>
+                <p class="scene-text">
+                    The morning sun catches the silk banners of the Wartburg. In the courtyard, knights in armor gather before a crowd
+                    of nobles and commoners alike. This is the <span class="german-word" data-term="turnier-card">Turnier</span>—a grand
+                    <span class="german-word" data-term="abenteuer-card">Abenteuer</span> of strength, skill, and honor.
+                </p>
+
+                <div class="ety-card" id="turnier-card">
+                    <div class="ety-card-title">Turnier (Tournament)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Turnier
+                        <div class="ety-text">From Old French "tournoi" (turn around, joust)</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Tournament
+                        <div class="ety-text">Also from French, but French had deeper influence on English after 1066</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 比武大赛 (bǐwǔ dàsài) — martial competition
+                        <div class="ety-text">A distinctly different cultural concept of martial prowess</div>
+                    </div>
+                </div>
+
+                <div class="ety-card" id="abenteuer-card">
+                    <div class="ety-card-title">Abenteuer (Adventure)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Abenteuer
+                        <div class="ety-text">From Old French "aventure" (happening, chance encounter)</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Adventure
+                        <div class="ety-text">We share the same French root, but German kept it more courtly</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 冒险 (màoxiǎn) — risk + adventure
+                        <div class="ety-text">Notice how German and Chinese each emphasize different aspects of adventure</div>
+                    </div>
+                </div>
+
+                <p class="scene-text">
+                    A knight in silver armor rides forward. His <span class="german-word" data-term="ritter-card">Ritter</span> is mounted
+                    on a white horse. The crowd cheers. But one person in the stands watches differently—a lady with roses in her hair.
+                </p>
+
+                <div class="ety-card" id="ritter-card">
+                    <div class="ety-card-title">Ritter (Knight)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Ritter
+                        <div class="ety-text">From Old High German "rittari" (rider, from "ritan" = to ride)</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Knight (from Old English "cniht" = young servant)
+                        <div class="ety-text">Different words entirely! English became a feudal title; German kept "rider"</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 骑士 (qìshì) — rider + scholar
+                        <div class="ety-text">The Chinese character preserves the "horse" element (骑) just like German "rittari"</div>
+                    </div>
+                </div>
+
+                <div class="aside-box">
+                    <div class="aside-title">Why did German resist French?</div>
+                    <div class="aside-text">
+                        After the Norman Conquest (1066), French became the language of power in England. English lost its native vocabulary
+                        wholesale—"cow" (English) vs "beef" (French-descended), "pig" vs "pork", "sheep" vs "mutton". But in the Germanic
+                        kingdoms, German remained the language of authority. They borrowed from French for new courtly concepts, but kept
+                        their core vocabulary. This is why German feels more "purely Germanic" than English.
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- SCENE 2: THE LADY AND THE HEART -->
+            <div class="scene">
+                <h2 class="scene-title">Szene 2: Das Herz</h2>
+                <p class="scene-text">
+                    The lady watches the knight from across the courtyard. There is something strange stirring in her
+                    <span class="german-word" data-term="herz-card">Herz</span>—a feeling she cannot name. Is it
+                    <span class="german-word" data-term="liebe-card">Liebe</span>? Or is it something deeper:
+                    <span class="german-word" data-term="sehnsucht-card">Sehnsucht</span>?
+                </p>
+
+                <div class="ety-card" id="herz-card">
+                    <div class="ety-card-title">Herz (Heart)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Herz
+                        <div class="ety-text">From Proto-Indo-European "ker" (to turn, encircle) — the seat of emotion</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Heart
+                        <div class="ety-text">Same root. Both languages use "heart" for emotion, not just physiology</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 心 (xīn) — heart
+                        <div class="ety-text">Remarkably, Chinese also uses "heart" as the seat of emotion and consciousness</div>
+                    </div>
+                </div>
+
+                <div class="ety-card" id="liebe-card">
+                    <div class="ety-card-title">Liebe (Love)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Liebe
+                        <div class="ety-text">From Proto-Indo-European "leubh" (to desire, to care) — pure Germanic</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Love
+                        <div class="ety-text">Same root. This is one of the deepest words we share with German</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 爱 (ài) / 爱情 (àiqíng) — love / love emotion
+                        <div class="ety-text">A different conceptual universe entirely. Compare the weight and history of these words</div>
+                    </div>
+                </div>
+
+                <div class="ety-card" id="sehnsucht-card">
+                    <div class="ety-card-title">Sehnsucht (Longing/Yearning)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Sehnsucht
+                        <div class="ety-text">A compound: "sehnen" (to yearn) + "sucht" (addiction, sickness). A yearning so deep it becomes an illness</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Longing (lacks the compound's intensity)
+                        <div class="ety-text">English has no single word to capture Sehnsucht's complexity—yearning, ache, sickness, desire all at once</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 渴望 (kěwàng) / 思念 (sīniàn)
+                        <div class="ety-text">渴望 emphasizes the thirst; 思念 emphasizes missing someone. German compounds both into one feeling</div>
+                    </div>
+                </div>
+
+                <p class="scene-text">
+                    The tournament continues. The knight on the white horse defeats his opponents one by one. But he does not fight for glory.
+                    He fights in hope that someone will notice.
+                </p>
+
+                <p class="scene-text">
+                    The lady rises from her seat. Around her <span class="german-word" data-term="gluck-card">Glück</span>—or is it
+                    <span class="german-word" data-term="schmerz-card">Schmerz</span>? The two feelings are so close, she cannot tell them apart.
+                </p>
+
+                <div class="ety-card" id="gluck-card">
+                    <div class="ety-card-title">Glück (Happiness / Luck)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Glück
+                        <div class="ety-text">From Middle Low German "gelücke" (luck, fortune). But it means BOTH luck and happiness—they're the same</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Luck / Happiness
+                        <div class="ety-text">We split these into two words. German keeps them unified: good fortune IS happiness</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 幸福 (xìngfú)
+                        <div class="ety-text">幸 = luck/fortune, 福 = blessing. Like German Glück, Chinese merges luck and happiness at their root</div>
+                    </div>
+                </div>
+
+                <div class="ety-card" id="schmerz-card">
+                    <div class="ety-card-title">Schmerz (Pain)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Schmerz
+                        <div class="ety-text">From Proto-Indo-European "sker" (to cut, turn) — pain that cuts into you</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Smart (archaic for pain/sting, now means clever)
+                        <div class="ety-text">Both come from the same root, but English dropped the pain meaning</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 疼痛 (téngtòng) / 心痛 (xīntòng)
+                        <div class="ety-text">心痛 literally means "heart pain"—the same metaphor as "heartache" in German romantic tradition</div>
+                    </div>
+                </div>
+
+                <div class="aside-box">
+                    <div class="aside-title">The Compound Power of German</div>
+                    <div class="aside-text">
+                        Notice how German creates Sehnsucht by combining two words? This is German's superpower. While French floods new
+                        loanwords into other languages, German and Chinese both prefer to build new meanings from existing roots.
+                        Sehnsucht, Fernweh (distance-pain), Weltschmerz (world-pain)—these untranslatable words are born from German's
+                        ability to compound. Chinese does the same: 长城 (great wall), 火车 (fire-vehicle/train).
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- SCENE 3: THE MEETING -->
+            <div class="scene">
+                <h2 class="scene-title">Szene 3: Die Begegnung</h2>
+                <p class="scene-text">
+                    After the tournament, the knight seeks the lady. He finds her in the castle garden, where roses grow crimson in the evening light.
+                    His armor is scarred. His face is tired. But his eyes are alive.
+                </p>
+
+                <p class="scene-text">
+                    He approaches with <span class="german-word" data-term="mut-card">Mut</span>—the courage of a man who has nothing left to lose,
+                    only a <span class="german-word" data-term="hoffnung-card">Hoffnung</span> to gain.
+                </p>
+
+                <div class="ety-card" id="mut-card">
+                    <div class="ety-card-title">Mut (Courage)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Mut
+                        <div class="ety-text">From Old High German "muot" (mind, spirit, feelings) — courage lives in the spirit</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Mood
+                        <div class="ety-text">Same root! But English shifted to emotional state, German kept the sense of spirit/determination</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 勇气 (yǒngqì) — bravery + spirit
+                        <div class="ety-text">Chinese also splits this into two characters: the spirit (气) gives courage its source</div>
+                    </div>
+                </div>
+
+                <div class="ety-card" id="hoffnung-card">
+                    <div class="ety-card-title">Hoffnung (Hope)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Hoffnung
+                        <div class="ety-text">From Old High German "hôfjan" (to hop, to leap)—hope is the leap of the heart</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Hope
+                        <div class="ety-text">Possibly related, but our "hope" feels more passive than German's "leap"</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 希望 (xīwàng) / 盼望 (pànwàng)
+                        <div class="ety-text">希 contains the idea of yearning light; 盼 suggests looking forward. Both are active, like German Hoffnung</div>
+                    </div>
+                </div>
+
+                <p class="scene-text">
+                    "Guten Tag," he says. (Good day.)
+                </p>
+
+                <p class="scene-text">
+                    She turns. Her face is flushed, but she does not run.
+                </p>
+
+                <p class="scene-text">
+                    "Wie heißt du?" she asks. (What are you called? / What is your name?)
+                </p>
+
+                <p class="scene-text">
+                    He bows. "Ich heiße Roland." (I am called Roland.)
+                </p>
+
+                <p class="scene-text">
+                    "Ich heiße Gisela," she replies.
+                </p>
+
+                <p class="scene-text">
+                    In this moment—this single moment—a <span class="german-word" data-term="freund-card">Freund</span> becomes more than a friend.
+                    Something that cannot be named in French. Something that cannot be borrowed. Something wholly born from the soil of German
+                    <span class="german-word" data-term="liebe-card">Liebe</span>.
+                </p>
+
+                <div class="ety-card" id="freund-card">
+                    <div class="ety-card-title">Freund (Friend)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Freund
+                        <div class="ety-text">From Old High German "friunt" (friend) related to "frei" (free)—a friend is someone you choose freely</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Friend
+                        <div class="ety-text">Same root, same concept. Freedom and friendship are intertwined in Germanic languages</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 朋友 (péngyou)
+                        <div class="ety-text">朋 (peng) and 友 (you) each mean friend/companion. The two moons side by side suggest companionship and balance</div>
+                    </div>
+                </div>
+
+                <div class="aside-box">
+                    <div class="aside-title">缘分 and the Meeting of Souls</div>
+                    <div class="aside-text">
+                        In Chinese, there is a concept with no German equivalent: 缘分 (yuánfèn)—fated connection. It suggests that some meetings
+                        are written into the fabric of the universe. Roland and Gisela would call this luck (Glück), or love (Liebe), or fate.
+                        But the Chinese word captures something deeper: the sense that their meeting was inevitable, that their souls
+                        were always meant to find each other. This is the poetry that different languages allow us to feel.
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- GUESS 1: FRENCH LOANWORDS -->
+            <div class="guess-section">
+                <h3 class="guess-title">Guessing Game 1: French Borrowing</h3>
+                <p class="guess-prompt">
+                    In this chapter, we encountered <strong>Turnier</strong> (tournament) and <strong>Abenteuer</strong> (adventure),
+                    both borrowed from French. But which of these words did German NOT borrow wholesale from French the way English did?
+                </p>
+                <div class="guess-options">
+                    <button class="guess-option" onclick="checkGuess(this, false)">
+                        Ritter (knight) — borrowed from French "chevalier"
+                    </button>
+                    <button class="guess-option" onclick="checkGuess(this, true)">
+                        Herz (heart) — kept the native Germanic word instead
+                    </button>
+                    <button class="guess-option" onclick="checkGuess(this, false)">
+                        Tanz (dance) — borrowed from French "danse"
+                    </button>
+                </div>
+                <div class="guess-feedback">
+                    <strong>Correct!</strong> German kept "Herz" as its native word for heart, while English also kept "heart" from Old English.
+                    But German went further—it resisted replacing core emotional and physical vocabulary with French terms, which is why German
+                    feels more "Germanic" than English, where French loanwords (beef, pork, mutton) replaced native vocabulary entirely.
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- SCENE 4: THE SONG -->
+            <div class="scene">
+                <h2 class="scene-title">Szene 4: Der Minnesang</h2>
+                <p class="scene-text">
+                    That evening, Roland takes up a lute and sings a <span class="german-word" data-term="minnesang-card">Minnesang</span>.
+                    This is the courtly tradition—not the troubadour songs of distant Provence, but the German answer.
+                    A song of <span class="german-word" data-term="minne-card">Minne</span>—a love so <span class="german-word" data-term="fein-card">fein</span>
+                    and refined that it becomes its own form of <span class="german-word" data-term="schmerz-card">Schmerz</span>.
+                </p>
+
+                <div class="ety-card" id="minnesang-card">
+                    <div class="ety-card-title">Minnesang (Love Song / Courtly Song)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Minnesang
+                        <div class="ety-text">From "Minne" (love, courtly love) + "Sang" (song). A distinctly German courtly tradition</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Courtly Love Poetry (we have no single word for this)
+                        <div class="ety-text">English borrowed French troubadour tradition but never developed its own distinct tradition</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 情歌 (qíng gē) — love song
+                        <div class="ety-text">Chinese doesn't distinguish between everyday love songs and the refined courtly tradition</div>
+                    </div>
+                </div>
+
+                <div class="ety-card" id="minne-card">
+                    <div class="ety-card-title">Minne (Courtly Love)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Minne
+                        <div class="ety-text">From Old High German "minnia" (memory, love, intention)—love as something you remember and cherish</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Amor, Passion, Courtly Love (no exact match)
+                        <div class="ety-text">We borrowed the concept from French/Latin, never fully naturalized it as one English word</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 爱 (ài) / 情 (qíng)
+                        <div class="ety-text">爱 is more universal love; 情 captures the emotional/romantic dimension specifically</div>
+                    </div>
+                </div>
+
+                <div class="ety-card" id="fein-card">
+                    <div class="ety-card-title">Fein (Fine / Refined)</div>
+                    <div class="ety-bridge german">
+                        <strong>German:</strong> Fein
+                        <div class="ety-text">From Middle High German, borrowed from Old French "fin" (fine, refined)—a French luxury concept</div>
+                    </div>
+                    <div class="ety-bridge english">
+                        <strong>English:</strong> Fine
+                        <div class="ety-text">We also borrowed from the same French root, which shows how shared European culture spread the word</div>
+                    </div>
+                    <div class="ety-bridge chinese">
+                        <strong>Chinese:</strong> 精细 (jīngxì) / 高雅 (gāo yǎ)
+                        <div class="ety-text">Different approach: breaking down fineness into its component parts rather than borrowing a single luxury term</div>
+                    </div>
+                </div>
+
+                <p class="scene-text">
+                    Gisela listens. She does not move. When Roland finishes, she approaches and does something that breaks all the rules of the court:
+                    she takes his hand.
+                </p>
+
+                <p class="scene-text">
+                    In that gesture, they acknowledge something beyond words. A moment of <span class="german-word" data-term="gluck-card">Glück</span>
+                    so perfect it becomes painful.
+                </p>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- WORD COLLECTION -->
+            <div class="word-collection">
+                <h3 class="collection-title">Words Encountered in Chapter 5</h3>
+                <div class="word-grid">
+                    <div class="word-card">
+                        <div class="word-de">Turnier</div>
+                        <div class="word-en">Tournament</div>
+                        <div class="word-zh">比武大赛</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Abenteuer</div>
+                        <div class="word-en">Adventure</div>
+                        <div class="word-zh">冒险</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Ritter</div>
+                        <div class="word-en">Knight</div>
+                        <div class="word-zh">骑士</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Herz</div>
+                        <div class="word-en">Heart</div>
+                        <div class="word-zh">心</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Liebe</div>
+                        <div class="word-en">Love</div>
+                        <div class="word-zh">爱/爱情</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Sehnsucht</div>
+                        <div class="word-en">Longing/Yearning</div>
+                        <div class="word-zh">渴望/思念</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Glück</div>
+                        <div class="word-en">Happiness/Luck</div>
+                        <div class="word-zh">幸福</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Schmerz</div>
+                        <div class="word-en">Pain</div>
+                        <div class="word-zh">疼痛</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Mut</div>
+                        <div class="word-en">Courage</div>
+                        <div class="word-zh">勇气</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Hoffnung</div>
+                        <div class="word-en">Hope</div>
+                        <div class="word-zh">希望</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Freund</div>
+                        <div class="word-en">Friend</div>
+                        <div class="word-zh">朋友</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Minnesang</div>
+                        <div class="word-en">Courtly Love Song</div>
+                        <div class="word-zh">情歌</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Minne</div>
+                        <div class="word-en">Courtly Love</div>
+                        <div class="word-zh">爱/情</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Fein</div>
+                        <div class="word-en">Fine/Refined</div>
+                        <div class="word-zh">精细/高雅</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Guten Tag</div>
+                        <div class="word-en">Good Day</div>
+                        <div class="word-zh">你好</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Wie heißt du?</div>
+                        <div class="word-en">What are you called?</div>
+                        <div class="word-zh">你叫什么名字?</div>
+                    </div>
+                    <div class="word-card">
+                        <div class="word-de">Ich heiße...</div>
+                        <div class="word-en">I am called...</div>
+                        <div class="word-zh">我叫...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- GUESS 2: EMOTION WORDS -->
+            <div class="guess-section">
+                <h3 class="guess-title">Guessing Game 2: The Language of Emotion</h3>
+                <p class="guess-prompt">
+                    German uses <strong>Glück</strong> to mean both "happiness" AND "luck"—concepts that are unified in the German mind.
+                    Which of these languages does something similar?
+                </p>
+                <div class="guess-options">
+                    <button class="guess-option" onclick="checkGuess(this, true)">
+                        Chinese: 幸福 (xìngfú) combines 幸 (luck/fortune) with 福 (blessing)
+                    </button>
+                    <button class="guess-option" onclick="checkGuess(this, false)">
+                        English: We keep "happiness" and "luck" completely separate
+                    </button>
+                    <button class="guess-option" onclick="checkGuess(this, false)">
+                        French: They use two entirely different root words
+                    </button>
+                </div>
+                <div class="guess-feedback">
+                    <strong>Correct!</strong> Both German and Chinese preserve an ancient understanding that luck and happiness are the same force.
+                    This shows how German and Chinese, despite being on opposite sides of Eurasia, sometimes share deep philosophical affinities
+                    that Indo-European languages like English fragmented long ago.
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- GUESS 3: BUILD YOUR FIRST SENTENCE -->
+            <div class="guess-section">
+                <h3 class="guess-title">Build Your First German Sentence</h3>
+                <p class="guess-prompt">
+                    You've learned how to introduce yourself. Following Roland's example, can you construct a proper introduction?
+                </p>
+                <p style="margin: 20px 0; text-align: center; font-size: 1.1rem;">
+                    <strong>Ich heiße [dein Name].</strong>
+                    <br><br>
+                    Replace [dein Name] with your name and read it aloud three times.
+                </p>
+                <p style="font-size: 0.95rem; color: var(--text-muted); margin: 20px 0;">
+                    Listen to how the sounds work in German. Notice how your name fits differently when you say it in German.
+                    In courtly culture, your name—how you presented yourself—was your identity. Same as today.
+                </p>
+                <button class="cta-button" onclick="document.querySelector('.guess-feedback').classList.add('visible'); this.style.display='none';">
+                    I've practiced my introduction
+                </button>
+                <div class="guess-feedback">
+                    <strong>Schön!</strong> (Beautiful!) You've just spoken your first complete German sentence. In the medieval court,
+                    this introduction—your name, your honor, your presence—would have been everything. You've now crossed that threshold too.
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- INSIGHTS -->
+            <div class="insights-section">
+                <h3 class="insights-title">Deep Insights: The Architecture of German</h3>
+
+                <div class="insight-item">
+                    <div class="insight-text">
+                        <strong>Why German Sounds "Purer" Than English:</strong> After the Norman Conquest in 1066, French became the prestige
+                        language of English-speaking nobility. Over the next 300 years, English replaced its native vocabulary wholesale. "Cow"
+                        comes from English "cū," but "beef" comes from French "boeuf." "Pig" (English) vs "pork" (French). "Sheep" (English)
+                        vs "mutton" (French). Today, about 30% of English comes from French.
+                        <br><br>
+                        German experienced no such conquest. The Holy Roman Empire was fragmented, ruled by German princes. German remained
+                        the language of power. When German borrowed from French—Turnier, Abenteuer, fein—it did so selectively, adding new
+                        words for new concepts, not replacing the old ones. This is why German still feels like a Germanic language, while
+                        English feels like a hybrid.
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-text">
+                        <strong>Sehnsucht: The Untranslatable Word:</strong> This word has no exact English equivalent. It combines yearning,
+                        longing, ache, sickness, desire—all into a single compound noun. Why? Because German, like Chinese, builds meaning
+                        through compounds. "Sehnen" (to yearn) + "Sucht" (sickness/addiction) = a yearning so deep it becomes a sickness of
+                        the soul. This is why German is the language of romantic literature. The Romantic period (1800s) found in German the
+                        perfect tool to express the inexplicable ache of the human heart.
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-text">
+                        <strong>Minnesan: A Distinctly German Tradition:</strong> While French had troubadours and Italian had dolce stil novo,
+                        German developed its own courtly love poetry tradition: Minnesang (love song). The poets—Walther von der Vogelweide,
+                        Wolfram von Eschenbach—sang in German, not in the international language of romance. This created a parallel literary
+                        universe where German could express courtly love on its own terms, creating its own vocabulary for refined emotion.
+                        This is why German, even today, preserves a uniqueness in expressing love, longing, and inner feeling.
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-text">
+                        <strong>Glück and the Philosophy of Luck:</strong> That German uses the same word for both "happiness" and "luck"
+                        reveals something profound about Germanic philosophy: happiness is not something you create, it's something that
+                        befalls you. It's external, fortunate, a gift. Chinese preserves the same philosophy in 幸福 (xìngfú). This contrasts
+                        with modern Western thought, which sees happiness as something to achieve through effort. The medieval Germans and Chinese
+                        understood it differently: you cannot pursue happiness; you can only be fortunate enough to encounter it.
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-text">
+                        <strong>The Emotional Core of Language:</strong> Notice how many words in this chapter are about feeling: Liebe (love),
+                        Herz (heart), Sehnsucht (yearning), Schmerz (pain), Hoffnung (hope), Glück (happiness). The Age of Courtly Culture
+                        wasn't just about knights and tournaments—it was about developing a new language for the interior human experience.
+                        Before this period, emotion was less refined, less articulate. The courtly tradition, both in German and across Europe,
+                        created the vocabulary we still use to talk about love and longing today.
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- TEASER FOR CHAPTER 6 -->
+            <div class="teaser-section">
+                <h3 class="teaser-title">Coming in Chapter 6...</h3>
+                <p class="teaser-text">
+                    The Age of Reason. The Age of Science. The Reformation. And the moment when German becomes not the language of knights and love songs,
+                    but the language of the human mind itself. German gives birth to philosophy, theology, music.
+                    Kant, Goethe, Schiller, Wagner, and the languages that have shaped how we think about meaning itself.
+                </p>
+                <p class="teaser-text" style="font-size: 0.95rem; font-style: normal; margin-top: 25px;">
+                    <strong>Chapter 6: "Das Wort der Seele" (The Word of the Soul)</strong>
+                    <br>
+                    When a medieval court closes, a new world opens. One where German transforms from the language of courtly refinement
+                    into the language of absolute depth.
+                </p>
+                <button class="teaser-button" onclick="alert('Chapter 6 will be available soon!')">
+                    Continue Reading
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Initialize particles with candlelight effect
+        function initParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = window.innerWidth > 768 ? 40 : 15;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle candlelight';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.width = (Math.random() * 3 + 1) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDuration = (Math.random() * 4 + 2) + 's';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Progress bar tracking
+        function updateProgressBar() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.querySelector('.progress-bar').style.width = scrollPercent + '%';
+        }
+
+        // Card toggle system
+        function setupCardToggle() {
+            const germanWords = document.querySelectorAll('.german-word');
+            germanWords.forEach(word => {
+                word.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const cardId = this.dataset.term;
+                    const card = document.getElementById(cardId);
+
+                    // Close all other cards
+                    document.querySelectorAll('.ety-card.visible').forEach(c => {
+                        if (c !== card) c.classList.remove('visible');
+                    });
+
+                    // Toggle this card
+                    if (card) {
+                        card.classList.toggle('visible');
+                        this.classList.toggle('active-card');
+                    }
+                });
+            });
+
+            // Close cards when clicking outside
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.ety-card.visible').forEach(c => {
+                    c.classList.remove('visible');
+                });
+                document.querySelectorAll('.german-word.active-card').forEach(w => {
+                    w.classList.remove('active-card');
+                });
+            });
+        }
+
+        // Guess game logic
+        function checkGuess(button, isCorrect) {
+            const section = button.closest('.guess-section');
+            const options = section.querySelectorAll('.guess-option');
+            const feedback = section.querySelector('.guess-feedback');
+
+            options.forEach(opt => {
+                opt.disabled = true;
+                if (opt === button) {
+                    opt.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else {
+                    opt.classList.add('incorrect');
+                }
+            });
+
+            feedback.classList.add('visible');
+        }
+
+        // Start button
+        document.getElementById('startBtn').addEventListener('click', function() {
+            document.getElementById('titleScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('visible');
+        });
+
+        // Initialize on load
+        window.addEventListener('load', function() {
+            initParticles();
+            setupCardToggle();
+            window.addEventListener('scroll', updateProgressBar);
+        });
+
+        // Handle touch for mobile
+        document.addEventListener('touchstart', function(e) {
+            const germanWord = e.target.closest('.german-word');
+            if (germanWord) {
+                germanWord.click();
+            }
+        }, { passive: true });
+
+        // Responsive particle adjustment
+        window.addEventListener('resize', function() {
+            document.getElementById('particles').innerHTML = '';
+            initParticles();
+        });
+    </script>
+</body>
+</html>

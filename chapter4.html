@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x-apple-disable-message-reformatting" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Das erste Wort">
+    <title>Chapter 4: Die Feder und das Pergament - Das erste Wort</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        html, body {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        :root {
+            --bg: #14110e;
+            --ink: #1a1e2a;
+            --parchment: #c4a44a;
+            --manuscript-red: #a83a3a;
+            --monk-brown: #6a4a2a;
+            --german: #e8a44a;
+            --chinese: #c49a6c;
+            --english: #8a9bae;
+            --latin: #c46a3a;
+            --accent-light: #d4b45a;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 20% 80%, rgba(196, 164, 74, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(106, 74, 42, 0.06) 0%, transparent 50%);
+            color: var(--parchment);
+            font-family: 'Noto Serif', serif;
+            font-size: 18px;
+            line-height: 1.7;
+            letter-spacing: 0.3px;
+            overflow-x: hidden;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background-color: var(--german);
+            z-index: 100;
+            width: 0%;
+            transition: width 0.1s ease-out;
+            box-shadow: 0 0 8px rgba(232, 164, 74, 0.6);
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Title Screen */
+        .title-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px 80px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .chapter-label {
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: var(--monk-brown);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .chapter-title {
+            font-size: 56px;
+            font-weight: 600;
+            color: var(--parchment);
+            margin-bottom: 10px;
+            font-family: 'Cormorant Garamond', serif;
+            line-height: 1.1;
+            letter-spacing: 1px;
+        }
+
+        .chapter-subtitle {
+            font-size: 24px;
+            color: var(--english);
+            margin-bottom: 40px;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .recap {
+            background-color: rgba(26, 30, 42, 0.4);
+            border-left: 4px solid var(--manuscript-red);
+            padding: 24px;
+            margin: 40px 0;
+            border-radius: 2px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--parchment);
+        }
+
+        .recap-title {
+            color: var(--manuscript-red);
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            font-size: 12px;
+            color: var(--german);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* Scenes and Narrative */
+        .scene {
+            opacity: 0;
+            animation: slideIn 0.8s ease-out forwards;
+        }
+
+        .scene.reveal {
+            animation: slideIn 0.8s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scene-marker {
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--german), transparent);
+            margin: 60px 0;
+            opacity: 0.3;
+        }
+
+        .narrative {
+            margin-bottom: 24px;
+            color: var(--parchment);
+            text-align: justify;
+        }
+
+        .narrative p {
+            margin-bottom: 24px;
+        }
+
+        /* German Words */
+        .german-word {
+            color: var(--german);
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            border-bottom: 2px dotted rgba(232, 164, 74, 0.4);
+            transition: all 0.2s ease;
+            user-select: text;
+        }
+
+        .german-word:hover {
+            color: var(--accent-light);
+            border-bottom-color: var(--accent-light);
+            text-shadow: 0 0 12px rgba(232, 164, 74, 0.3);
+        }
+
+        /* Etymology Cards */
+        .ety-card {
+            background-color: rgba(106, 74, 42, 0.3);
+            border: 1px solid var(--german);
+            border-radius: 4px;
+            padding: 24px;
+            margin: 20px 0;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+        }
+
+        .ety-card.active {
+            max-height: 1000px;
+            opacity: 1;
+            padding: 24px;
+        }
+
+        .word-header {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            color: var(--german);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .word-meaning {
+            font-size: 16px;
+            color: var(--english);
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .bridge {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .bridge-item {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            background-color: rgba(26, 30, 42, 0.6);
+            border-left: 3px solid var(--parchment);
+            border-radius: 2px;
+            font-size: 14px;
+        }
+
+        .bridge-label {
+            color: var(--parchment);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .bridge-text {
+            color: var(--parchment);
+            font-size: 15px;
+        }
+
+        .story-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(196, 164, 74, 0.3);
+            font-size: 15px;
+            color: rgba(196, 164, 74, 0.9);
+            line-height: 1.6;
+        }
+
+        .story-section strong {
+            color: var(--german);
+        }
+
+        /* Guess Sections */
+        .guess-section {
+            background-color: rgba(168, 58, 58, 0.15);
+            border: 2px solid var(--manuscript-red);
+            border-radius: 4px;
+            padding: 24px;
+            margin: 32px 0;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .guess-label {
+            color: var(--manuscript-red);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .prompt {
+            font-size: 18px;
+            color: var(--parchment);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .guess-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            padding: 14px 16px;
+            background-color: rgba(26, 30, 42, 0.5);
+            border: 2px solid var(--german);
+            color: var(--parchment);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            font-family: 'Noto Serif', serif;
+            user-select: none;
+        }
+
+        .option-btn:hover {
+            background-color: rgba(232, 164, 74, 0.2);
+            border-color: var(--accent-light);
+            color: var(--accent-light);
+        }
+
+        .option-btn.selected {
+            background-color: var(--german);
+            color: var(--ink);
+            border-color: var(--german);
+        }
+
+        .option-btn.correct {
+            background-color: rgba(106, 170, 106, 0.4);
+            border-color: #6aaa6a;
+            color: #a8d4a8;
+        }
+
+        .option-btn.incorrect {
+            background-color: rgba(168, 58, 58, 0.4);
+            border-color: var(--manuscript-red);
+            color: #d4a8a8;
+        }
+
+        .guess-btn {
+            padding: 14px 28px;
+            background-color: var(--german);
+            color: var(--ink);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-family: 'Noto Serif', serif;
+            user-select: none;
+        }
+
+        .guess-btn:hover {
+            background-color: var(--accent-light);
+            box-shadow: 0 6px 20px rgba(232, 164, 74, 0.3);
+        }
+
+        .guess-btn:active {
+            transform: scale(0.98);
+        }
+
+        .guess-feedback {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 4px;
+            font-size: 15px;
+            line-height: 1.6;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.3s ease, max-height 0.3s ease;
+        }
+
+        .guess-feedback.show {
+            opacity: 1;
+            max-height: 300px;
+        }
+
+        .guess-feedback.correct {
+            background-color: rgba(106, 170, 106, 0.2);
+            color: #a8d4a8;
+            border-left: 4px solid #6aaa6a;
+        }
+
+        .guess-feedback.incorrect {
+            background-color: rgba(168, 58, 58, 0.2);
+            color: #d4a8a8;
+            border-left: 4px solid var(--manuscript-red);
+        }
+
+        /* Divider */
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--parchment), transparent);
+            margin: 60px 0;
+            opacity: 0.3;
+        }
+
+        /* Word Collection */
+        .word-collection {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 2px solid var(--german);
+        }
+
+        .collection-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            color: var(--parchment);
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .collected-word {
+            padding: 16px;
+            margin-bottom: 12px;
+            background-color: rgba(106, 74, 42, 0.2);
+            border-left: 4px solid var(--german);
+            border-radius: 2px;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.6s ease-out forwards;
+        }
+
+        .collected-word .word {
+            color: var(--german);
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .collected-word .definition {
+            color: var(--english);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .collected-word .notes {
+            color: rgba(196, 164, 74, 0.7);
+            font-size: 13px;
+            font-style: italic;
+        }
+
+        /* Aside Box */
+        .aside-box {
+            background-color: rgba(196, 164, 74, 0.1);
+            border: 2px solid var(--parchment);
+            border-radius: 4px;
+            padding: 28px;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .aside-title {
+            color: var(--manuscript-red);
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .aside-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--parchment);
+        }
+
+        .aside-content p {
+            margin-bottom: 12px;
+        }
+
+        /* Chapter End */
+        .chapter-end {
+            text-align: center;
+            padding: 60px 20px;
+            margin-top: 80px;
+        }
+
+        .end-text {
+            font-size: 18px;
+            color: var(--parchment);
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .teaser {
+            font-size: 20px;
+            font-style: italic;
+            color: var(--german);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .next-chapter-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--monk-brown);
+            margin-top: 30px;
+        }
+
+        /* Mobile Optimizations */
+        @media max-width 768px {
+            body {
+                font-size: 16px !important;
+                line-height: 1.6 !important;
+            }
+
+            .container {
+                padding: 24px 16px !important;
+            }
+
+            .chapter-title {
+                font-size: 40px !important;
+            }
+
+            .chapter-subtitle {
+                font-size: 18px !important;
+            }
+
+            .word-header {
+                font-size: 24px !important;
+            }
+
+            .ety-card {
+                padding: 18px !important;
+            }
+
+            .title-screen {
+                padding: 40px 16px 60px !important;
+                min-height: auto !important;
+            }
+        }
+
+        @media max-width 600px {
+            body {
+                font-size: 15px !important;
+            }
+
+            .container {
+                padding: 20px 14px !important;
+                max-width: 100% !important;
+            }
+
+            .chapter-title {
+                font-size: 32px !important;
+                margin-bottom: 8px !important;
+            }
+
+            .chapter-subtitle {
+                font-size: 16px !important;
+            }
+
+            .narrative {
+                font-size: 15px !important;
+                line-height: 1.6 !important;
+            }
+
+            .guess-section {
+                padding: 18px !important;
+            }
+
+            .prompt {
+                font-size: 16px !important;
+            }
+
+            .collection-title {
+                font-size: 24px !important;
+            }
+
+            .word-header {
+                font-size: 20px !important;
+            }
+
+            .bridge {
+                gap: 8px !important;
+            }
+
+            .bridge-item {
+                min-width: 100px !important;
+                padding: 10px !important;
+                font-size: 13px !important;
+            }
+        }
+
+        @media max-width 380px {
+            body {
+                font-size: 14px !important;
+                line-height: 1.5 !important;
+            }
+
+            .chapter-title {
+                font-size: 28px !important;
+            }
+
+            .chapter-subtitle {
+                font-size: 14px !important;
+            }
+
+            .container {
+                padding: 16px 12px !important;
+            }
+
+            .recap {
+                padding: 16px !important;
+                font-size: 14px !important;
+            }
+
+            .ety-card {
+                padding: 14px !important;
+            }
+
+            .bridge-item {
+                min-width: auto !important;
+                flex: 1 1 100% !important;
+            }
+
+            .guess-options {
+                gap: 8px !important;
+            }
+
+            .option-btn {
+                padding: 12px 14px !important;
+                font-size: 14px !important;
+            }
+
+            .guess-btn {
+                padding: 12px 20px !important;
+                font-size: 14px !important;
+            }
+        }
+
+        /* Safe area support */
+        @supports (padding: max(0px)) {
+            .container {
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
+            }
+
+            .chapter-end {
+                padding-bottom: max(60px, calc(60px + env(safe-area-inset-bottom)));
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+    <div class="progress-bar"></div>
+
+    <div class="container">
+        <!-- Title Screen -->
+        <section class="title-screen">
+            <div class="chapter-label">Chapter 4</div>
+            <h1 class="chapter-title">Die Feder und das Pergament</h1>
+            <div class="chapter-subtitle">The Quill and the Parchment</div>
+
+            <div class="recap">
+                <div class="recap-title">Previously in Das erste Wort</div>
+                <p>We traced German's roots from the windswept Indo-European steppe, through the forests where Germanic tribes spoke of compounds like <em>Wasserbahn</em>. We saw Latin words arriving with Roman legions. Now, in the 8th century, something unprecedented happens: monks begin writing German down. For the first time in history, this scattered, spoken language gets fixed in ink.</p>
+            </div>
+
+            <div class="scroll-hint">↓ Scroll to Begin ↓</div>
+        </section>
+
+        <!-- Scene 1: The Scriptorium -->
+        <section class="scene">
+            <div class="narrative">
+                <p>The year is 765 CE. In the monastery at Fulda, far inland in what will become Germany, a monk sits hunched over a wooden desk. The morning light slants through the tall windows of the <span class="german-word" data-card="kirche">Kirche</span>, catching the dust motes in the air. His fingers, stained with ink, grip a <span class="german-word" data-card="feder">Feder</span>—a feather sharpened to a point.</p>
+
+                <p>For eight hundred years, German has been a <em>spoken</em> language only. Germanic tribes, medieval kingdoms, peasants in fields and lords in halls—all spoke German. But no one wrote it down. The <span class="german-word" data-card="buch">Bücher</span> (books) were written in Latin, the language of the <span class="german-word" data-card="gott">Gott</span>, the <span class="german-word" data-card="himmel">Himmel</span>, eternal truth.</p>
+
+                <p>German was for speaking. Latin was for <em>writing</em>.</p>
+
+                <p>This monk is about to break that rule.</p>
+            </div>
+        </section>
+
+        <!-- Etymology Cards Row 1 -->
+        <div id="card-kirche" class="ety-card">
+            <div class="word-header">Kirche</div>
+            <div class="word-meaning">Church, place of worship</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Kirche</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">Church</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Greek</div>
+                    <div class="bridge-text">kyriakon (κυριακόν)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">教堂 (jiàotáng)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> This word didn't come from German's own roots. It arrived from Greek <em>kyriakon</em> ("of the Lord," literally "belonging to the Lord"). As Christianity spread, German speakers borrowed this word wholesale from Greek, via Latin. It's a perfect example of how <em>ideas</em> change language—when a new religion arrives, new words follow.
+            </div>
+        </div>
+
+        <div id="card-feder" class="ety-card">
+            <div class="word-header">Feder</div>
+            <div class="word-meaning">Feather, writing quill</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Feder</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">Feather</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">PIE Root</div>
+                    <div class="bridge-text">*pet- (to fly)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">羽毛 (yǔmáo)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> This is ancient. The PIE root <em>*pet-</em> meant "to fly," and a feather is what lets things fly. Same root as "petition" (laying out your case, making your appeal <em>take flight</em>). In medieval monasteries, feathers became writing tools—the technology that let thoughts take flight in permanent form.
+            </div>
+        </div>
+
+        <div id="card-buch" class="ety-card">
+            <div class="word-header">Buch</div>
+            <div class="word-meaning">Book, written text</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Buch</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">Book</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Old English</div>
+                    <div class="bridge-text">Bōc (beech tree)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">书 (shū)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> Why would a "book" be named after a tree? Because Germanic peoples carved their runes on beech wood. Before paper or parchment, a <em>buch</em> was literally a beech board. This is material history frozen in a word. Even as technology changed from wood to vellum, the name stayed.
+            </div>
+        </div>
+
+        <div id="card-gott" class="ety-card">
+            <div class="word-header">Gott</div>
+            <div class="word-meaning">God</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Gott</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">God</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">PIE Root</div>
+                    <div class="bridge-text">*ghuto- (invoked)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">上帝 (shàngdì)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> Both German <em>Gott</em> and English <em>God</em> come from the same ancient root meaning "the invoked one"—a deity you call upon. This shared vocabulary goes back thousands of years, before any written language, to when Indo-European peoples first stood in awe and spoke to the heavens.
+            </div>
+        </div>
+
+        <div id="card-himmel" class="ety-card">
+            <div class="word-header">Himmel</div>
+            <div class="word-meaning">Heaven, sky, the heavens</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Himmel</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">(archaic) Hemel, Hymmel</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">PIE Root</div>
+                    <div class="bridge-text">*kem- (to cover)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">天堂 (tiāntáng)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> "Heaven" is what <em>covers</em> us—the sky is a dome, a vault overhead. The metaphor is universal: humans look up and see the protective, encompassing sky. Germanic peoples used this same image as Indo-European speakers thousands of years before.
+            </div>
+        </div>
+
+        <div class="scene-marker"></div>
+
+        <!-- Scene 2: The Abrogans -->
+        <section class="scene">
+            <div class="narrative">
+                <p>The monk's name is lost to history. But what he creates will survive: the <strong>Abrogans</strong>, named after the opening words "Abrogans sanctus" ("Holy, merciful"). It is the first German-Latin dictionary ever written.</p>
+
+                <p>Think about this for a moment. For eight centuries, monks had been writing <em>in Latin</em>—copying scripture, recording theology, preserving the knowledge of Rome. But the <span class="german-word" data-card="sprache">Sprache</span> they <span class="german-word" data-card="sprechen">sprachen</span> every day remained <em>unrecorded</em>. A peasant's prayers were German. A mother's <span class="german-word" data-card="wort">Worte</span> to her child were German. But writing belonged to Latin.</p>
+
+                <p>This monk looks at his <span class="german-word" data-card="erde">Erde</span>—his homeland, still Germanic—and realizes something radical: <em>German deserves to be written.</em></p>
+
+                <p>He doesn't know it, but he's beginning something that will take 800 more years to fully unfold. He's claiming that German—this "mere dialect," this spoken tongue—has enough substance to deserve Latin company in a <span class="german-word" data-card="buch">Buch</span>.</p>
+            </div>
+        </section>
+
+        <!-- Etymology Cards Row 2 -->
+        <div id="card-sprache" class="ety-card">
+            <div class="word-header">Sprache</div>
+            <div class="word-meaning">Language, speech</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Sprache</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">Speech (archaic)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Root</div>
+                    <div class="bridge-text">sprechen (to speak)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">语言 (yǔyán)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> A language is what you make when you speak. <em>Sprache</em> comes directly from <em>sprechen</em>—the act crystallized into a system. This captures something true: a language isn't an abstract thing, it's the living utterance of a people. Every time Germans spoke, they were making their language.
+            </div>
+        </div>
+
+        <div id="card-sprechen" class="ety-card">
+            <div class="word-header">Sprechen</div>
+            <div class="word-meaning">To speak, to say</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Sprechen</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">Speak</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">PIE Root</div>
+                    <div class="bridge-text">*sper- (to strew, scatter)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">说话 (shuōhuà)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> Notice the <em>spr</em>- pattern? Germanic languages show this cluster often (sprout, sprig, spray). The ancient root meant "to scatter"—words scatter from your mouth like seeds on wind. It's a metaphor that predates writing itself, when all communication was scattered breath.
+            </div>
+        </div>
+
+        <div id="card-wort" class="ety-card">
+            <div class="word-header">Wort</div>
+            <div class="word-meaning">Word, utterance</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Wort</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">Word</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">PIE Root</div>
+                    <div class="bridge-text">*werdh- (to turn, speak)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">词 (cí) or 字 (zì)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> German and English use nearly identical words for "word." This shared vocabulary shows us speaking the same language 1,500 years ago. A word is literally something that "turns"—you turn breath into meaning, turn silence into sound.
+            </div>
+        </div>
+
+        <div id="card-erde" class="ety-card">
+            <div class="word-header">Erde</div>
+            <div class="word-meaning">Earth, land, ground</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Erde</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">Earth</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">PIE Root</div>
+                    <div class="bridge-text">*er- (earth, ground)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">地 (dì) or 土 (tǔ)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> This is one of the most ancient cognates between English and German. Both languages preserved the exact same word for "earth" for 1,500+ years. When a German speaker said <em>Erde</em>, they were speaking a word that connected them to every Indo-European people—to earth itself, their grounding.
+            </div>
+        </div>
+
+        <div class="scene-marker"></div>
+
+        <!-- Scene 3: German Sentence Structure -->
+        <section class="scene">
+            <div class="narrative">
+                <p>But there's something peculiar about German writing. It's not just new words the monk is recording. It's a whole <em>way of building sentences</em> that's completely different from Latin.</p>
+
+                <p>In Latin, you write: <em>Ego aquam bibo</em> (I water drink). In German, it's: <em>Ich trinke Wasser</em> (I drink water). Look familiar? Yes—because English learned from German.</p>
+
+                <p>But now watch what happens when you add desire, obligation, or possibility:</p>
+
+                <p style="text-align: center; margin: 30px 0; font-style: italic; color: var(--english);">
+                    I would like to drink water.<br>
+                    <span style="color: var(--german);">Ich möchte Wasser trinken.</span>
+                </p>
+
+                <p>The verb moves to the END. In Latin, this would be unthinkable—like hiding the punchline until the very last word. But in German, this is the rule. In a sentence with a main verb and an infinitive, the infinitive goes last. And this isn't random. It's <em>dramatic</em>. The most important action—the thing you actually want to do—comes last, emphasized by its placement. It's a linguistic suspense.</p>
+            </div>
+        </section>
+
+        <!-- GUESS SECTION 1: Sentence Structure -->
+        <div class="guess-section">
+            <div class="guess-label">Test Your Understanding</div>
+            <div class="prompt">In German, "Ich kann das Buch lesen" (I can the book read) has the infinitive at the end. Why might German place the main action last instead of early?</div>
+            <div class="guess-options">
+                <button class="option-btn" data-value="a">A) German speakers are disorganized and forgot how to speak properly</button>
+                <button class="option-btn" data-value="b">B) It's a dramatic choice—the climax of what you want to do comes at the end, like saving a punchline</button>
+                <button class="option-btn" data-value="c">C) German verbs are lazy and refuse to work until the end of the sentence</button>
+                <button class="option-btn" data-value="d">D) The word order is identical to Latin, you just don't understand Latin</button>
+            </div>
+            <button class="guess-btn">Submit Answer</button>
+            <div class="guess-feedback"></div>
+        </div>
+
+        <section class="scene">
+            <div class="narrative">
+                <p>This structure will puzzle language learners for centuries. But there's genius in it. German saves the punchline. When you say "Ich möchte morgen nach Berlin fahren" (I would like tomorrow to Berlin to go), you're building suspense. You've named the wish, named the time, named the destination—and then you land on the ACTION, the infinitive: <em>fahren</em> (to go). It's the verb at the end that makes the whole sentence collapse into meaning.</p>
+
+                <p>This is not a flaw. This is architecture.</p>
+            </div>
+        </section>
+
+        <div class="scene-marker"></div>
+
+        <!-- Scene 4: Luther's Revolution -->
+        <section class="scene">
+            <div class="narrative">
+                <p>Fast forward 769 years. It's 1534, and a former monk named Martin Luther has just <span class="german-word" data-card="verstehen">verstanden</span> something profound: <em>German itself can express theology.</em></p>
+
+                <p>Luther has shattered the monastery. He's married, left the church, and become a man obsessed with one thing: translating the Bible into German. Not for scholars. Not for monks. For <em>ordinary people</em>.</p>
+
+                <p>In his time, there are dozens of "Germanys"—dozens of dialects so different that a merchant from Munich couldn't be understood in Hamburg. There is no standard written German. Just regional variations, all spoken, most unwritten.</p>
+
+                <p>When Luther sits down to translate Scripture into German, he faces an impossible problem: <em>Which German?</em> Munich German? Bavarian? Saxon? Swabian?</p>
+
+                <p>His answer: He doesn't choose <em>any</em> of them. Instead, he does something that will reshape the German language forever. He creates a <strong>unified German</strong>—drawing from multiple dialects, choosing the clearest expressions, inventing new words where needed. He makes <em>himself</em> the standard.</p>
+
+                <p>This is the equivalent of Shakespeare single-handedly shaping English. Luther's Bible becomes so influential, so beloved, that his version of German becomes <em>the</em> German. The language crystallizes around his choices.</p>
+            </div>
+        </section>
+
+        <!-- Etymology Card: Verstehen -->
+        <div id="card-verstehen" class="ety-card">
+            <div class="word-header">Verstehen</div>
+            <div class="word-meaning">To understand, to comprehend</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Verstehen</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Components</div>
+                    <div class="bridge-text">ver- + stehen</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Stehen</div>
+                    <div class="bridge-text">to stand</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">理解 (lǐjiě)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> This is a <em>compound verb</em>, showing German's love of combining words. Literally, <em>ver-stehen</em> means "to stand before" or "to stand among." The metaphor is beautiful: understanding is standing <em>in the midst</em> of something, being surrounded by it, becoming one with it. You understand a situation by standing in the middle of it.
+            </div>
+        </div>
+
+        <!-- GUESS SECTION 2: Luther's Choice -->
+        <div class="guess-section">
+            <div class="guess-label">Test Your Understanding</div>
+            <div class="prompt">When Martin Luther translated the Bible into German in 1534, dozens of German dialects existed and couldn't understand each other. What did Luther do?</div>
+            <div class="guess-options">
+                <button class="option-btn" data-value="a">A) Translated the Bible 40 times, once for each dialect</button>
+                <button class="option-btn" data-value="b">B) Asked the Pope to choose which dialect was "correct"</button>
+                <button class="option-btn" data-value="c">C) Created a unified German by drawing from multiple dialects, making his translation so influential it became the standard</button>
+                <button class="option-btn" data-value="d">D) Gave up and translated it into Latin instead</button>
+            </div>
+            <button class="guess-btn">Submit Answer</button>
+            <div class="guess-feedback"></div>
+        </div>
+
+        <section class="scene">
+            <div class="narrative">
+                <p>The monks' first step—that Abrogans from 765 CE—took German from the realm of the purely spoken. Luther's step took it into the realm of <em>power</em>. The Bible is the most read book in Christian Europe. Suddenly, millions of Germans encounter their language in print, in scripture, shaped by Luther's choices.</p>
+
+                <p>Before Luther: German is many dialects, with no written standard.</p>
+
+                <p>After Luther: German <em>is</em> his German. The language becomes unified, codified, powerful.</p>
+
+                <p>This is how languages become real—not through royal decree, but through the sheer gravity of influential translation. Shakespeare did this for English. Luther did it for German. They didn't invent the language; they <em>clarified</em> it, unified it, made it worthy of immortal thoughts.</p>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Scene 5: The Architecture of German -->
+        <section class="scene">
+            <div class="narrative">
+                <p>By the medieval period, German had fully developed its characteristic architecture—that peculiar way of building sentences, that love of compound words, that ability to pack meaning into unexpected places.</p>
+
+                <p>Compare German to Latin:</p>
+
+                <p style="text-align: center; margin: 30px 0; font-size: 15px;">
+                    <strong style="color: var(--latin);">Latin (endings change meaning):</strong><br>
+                    <em style="color: var(--latin);">Rosa rosae rosae rosam rosae rosae</em><br>
+                    (One word, six different endings to show case/number)
+                </p>
+
+                <p style="text-align: center; margin: 30px 0; font-size: 15px;">
+                    <strong style="color: var(--german);">German (compounds + word order):</strong><br>
+                    <em style="color: var(--german);">Ich sehe die Rose. Der Rose Duft ist schön.</em><br>
+                    (Different words, different positions to show relationships)
+                </p>
+
+                <p>Latin is <em>inflectional</em> (changes the endings). German is <em>compound-building and positional</em> (moves words around, glues them together). This reflects a deep cultural difference: Latin speakers were organizing an empire. Germanic speakers were building communities in forests, making compounds to describe their world.</p>
+
+                <p>The <span class="german-word" data-card="seele">Seele</span>—the soul—understands this. Medieval theologians recognized that certain languages fit certain thoughts. Latin for logic and law. German for feeling, for prayer, for the intimate address to God. When Luther translated the Bible, he wasn't just changing words. He was claiming that German could reach the <em>Seele</em> in a way Latin never could.</p>
+            </div>
+        </section>
+
+        <!-- Etymology Card: Seele -->
+        <div id="card-seele" class="ety-card">
+            <div class="word-header">Seele</div>
+            <div class="word-meaning">Soul, spirit, inner self</div>
+            <div class="bridge">
+                <div class="bridge-item">
+                    <div class="bridge-label">German</div>
+                    <div class="bridge-text">Seele</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">English</div>
+                    <div class="bridge-text">Soul</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">PIE Root</div>
+                    <div class="bridge-text">*wel- (to whirl, move)</div>
+                </div>
+                <div class="bridge-item">
+                    <div class="bridge-label">Chinese</div>
+                    <div class="bridge-text">灵魂 (línghún)</div>
+                </div>
+            </div>
+            <div class="story-section">
+                <strong>The Story:</strong> The soul is what <em>moves</em> you—what animates, what whirls within. Germanic and Romance languages both use words descended from the same root: the soul as motion, as life-force. This is metaphor as deep as human consciousness gets. Before any theology, humans watched the wind, saw things moving, and named that movement "soul."
+            </div>
+        </section>
+
+        <!-- GUESS SECTION 3: Chinese Parallel -->
+        <div class="guess-section">
+            <div class="guess-label">Test Your Understanding</div>
+            <div class="prompt">The chapter mentions Classical Chinese (文言文, wényánwén) vs. modern Chinese (白话文, báihuà wén)—a tension between literary and spoken language. This is similar to German's situation. Why?</div>
+            <div class="guess-options">
+                <button class="option-btn" data-value="a">A) Both languages use Latin for serious writing</button>
+                <button class="option-btn" data-value="b">B) In both German and Chinese, the written standard was different from the spoken language, until reformers unified them</button>
+                <button class="option-btn" data-value="c">C) Classical Chinese and Medieval German are the same language</button>
+                <button class="option-btn" data-value="d">D) This is not a real parallel; only German had this problem</button>
+            </div>
+            <button class="guess-btn">Submit Answer</button>
+            <div class="guess-feedback"></div>
+        </div>
+
+        <section class="scene">
+            <div class="narrative">
+                <p>This is the parallel to Classical versus Modern Chinese. For centuries, educated Chinese people wrote in Classical Chinese (文言文)—a formal, ancient standard—while speaking Mandarin or Cantonese or other varieties in daily life. There was a <em>fracture</em> between written and spoken language.</p>
+
+                <p>Similarly, medieval Germans faced a fracture: Latin for writing, German for living. Monks and scholars wrote in Latin. Parents taught children in German. Priests preached in Latin. Markets haggled in German. The <span class="german-word" data-card="seele">Seele</span> lived in one language; the intellect in another.</p>
+
+                <p>When reformers finally unified the written standard—whether it was the monk making the Abrogans, or Luther making his Bible—they were <em>bridging the fracture</em>. They were saying: <em>The language people speak is worthy of the permanence that writing grants.</em></p>
+
+                <p>This is how languages mature. Not through purity, but through <em>integration</em>—making the written and spoken one.</p>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Word Collection -->
+        <div class="word-collection">
+            <h2 class="collection-title">Words Discovered in the Scriptorium</h2>
+
+            <div class="collected-word" data-delay="0">
+                <div class="word">Kirche</div>
+                <div class="definition">Church</div>
+                <div class="notes">From Greek kyriakon (of the Lord). Ideas bring words.</div>
+            </div>
+
+            <div class="collected-word" data-delay="1">
+                <div class="word">Feder</div>
+                <div class="definition">Feather, quill</div>
+                <div class="notes">PIE *pet- (to fly). What lets thoughts take flight.</div>
+            </div>
+
+            <div class="collected-word" data-delay="2">
+                <div class="word">Buch</div>
+                <div class="definition">Book</div>
+                <div class="notes">From beech trees where runes were carved. Material history in a word.</div>
+            </div>
+
+            <div class="collected-word" data-delay="3">
+                <div class="word">Gott</div>
+                <div class="definition">God</div>
+                <div class="notes">PIE *ghuto- (invoked one). What you call upon.</div>
+            </div>
+
+            <div class="collected-word" data-delay="4">
+                <div class="word">Himmel</div>
+                <div class="definition">Heaven, sky</div>
+                <div class="notes">PIE *kem- (to cover). The protective dome overhead.</div>
+            </div>
+
+            <div class="collected-word" data-delay="5">
+                <div class="word">Sprache</div>
+                <div class="definition">Language</div>
+                <div class="notes">From sprechen (to speak). A language is speaking crystallized into system.</div>
+            </div>
+
+            <div class="collected-word" data-delay="6">
+                <div class="word">Sprechen</div>
+                <div class="definition">To speak</div>
+                <div class="notes">PIE *sper- (to scatter). Words scattered like seeds on wind.</div>
+            </div>
+
+            <div class="collected-word" data-delay="7">
+                <div class="word">Wort</div>
+                <div class="definition">Word</div>
+                <div class="notes">Nearly identical in English and German. Shared across 1,500 years.</div>
+            </div>
+
+            <div class="collected-word" data-delay="8">
+                <div class="word">Erde</div>
+                <div class="definition">Earth, land</div>
+                <div class="notes">PIE *er- (earth). What grounds us, what we stand on.</div>
+            </div>
+
+            <div class="collected-word" data-delay="9">
+                <div class="word">Verstehen</div>
+                <div class="definition">To understand</div>
+                <div class="notes">ver- + stehen (to stand). To stand in the midst of something.</div>
+            </div>
+
+            <div class="collected-word" data-delay="10">
+                <div class="word">Seele</div>
+                <div class="definition">Soul</div>
+                <div class="notes">PIE *wel- (to whirl, move). What animates, what moves within.</div>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="aside-box">
+            <div class="aside-title">The Breakthrough: Writing Captures Speech</div>
+            <div class="aside-content">
+                <p><strong>From the Abrogans (765 CE) onward:</strong> German moves from purely spoken language to written language. This is revolutionary—not because the language changes, but because it gets <em>recorded</em>, <em>codified</em>, <em>preserved</em>.</p>
+
+                <p><strong>Martin Luther's Unification (1534):</strong> Luther takes dozens of mutually unintelligible German dialects and unifies them through his Bible translation. His choices become canonical. This is how Shakespeare shaped English—through the sheer influence of beloved, repeated works.</p>
+
+                <p><strong>German Sentence Structure:</strong> German saves the punchline. The infinitive verb comes at the end, building dramatic suspense. This reflects a different way of thinking—Germanic cultures built sentences differently from Latin cultures.</p>
+
+                <p><strong>The Chinese Parallel:</strong> Just as Classical Chinese differed from spoken language, Medieval German faced a fracture between Latin (written, formal) and German (spoken, living). Reformers bridged this gap.</p>
+            </div>
+        </div>
+
+        <!-- Chapter End -->
+        <div class="chapter-end">
+            <p class="end-text">The monks in their scriptorium have given German a <span class="german-word" data-card="seele">Seele</span>—a recorded soul. Luther has given it power. But German's story is far from over. In the next chapter, we step into the glittering courts of medieval nobility, where a different influence is creeping in. From the west, across the channel, a entirely new language is about to reshape German vocabulary—and it will arrive not through conquest, but through culture.</p>
+
+            <p class="teaser">What happens when the language of Love, of Courtly Grace, and of Nobility enters German? Chapter 5: Das Herz der Höfe (The Heart of the Courts)—where French elegance begins to dance with Germanic strength.</p>
+
+            <div class="next-chapter-label">→ Chapter 5 Coming Soon ←</div>
+        </div>
+    </div>
+
+    <script>
+        // Particle System
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Dust particles
+        const particles = [];
+        const particleCount = window.innerWidth < 768 ? 20 : 40;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.1;
+                this.size = Math.random() * 2 + 1;
+                this.opacity = Math.random() * 0.3 + 0.1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(196, 164, 74, ${this.opacity})`;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Progress Bar
+        const progressBar = document.querySelector('.progress-bar');
+        function updateProgress() {
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = window.scrollY;
+            const progress = (scrolled / scrollHeight) * 100;
+            progressBar.style.width = progress + '%';
+        }
+        window.addEventListener('scroll', updateProgress);
+
+        // Scroll Reveal with IntersectionObserver
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.scene').forEach(scene => {
+            observer.observe(scene);
+        });
+
+        // Word animation stagger
+        document.querySelectorAll('.collected-word').forEach(word => {
+            const delay = word.dataset.delay || 0;
+            word.style.animationDelay = (delay * 100) + 'ms';
+        });
+
+        // Etymology Card Toggle
+        document.querySelectorAll('.german-word').forEach(word => {
+            word.addEventListener('click', function(e) {
+                e.preventDefault();
+                const cardId = this.dataset.card;
+                const card = document.getElementById('card-' + cardId);
+                if (card) {
+                    card.classList.toggle('active');
+                }
+            });
+        });
+
+        // Guess Questions
+        document.querySelectorAll('.guess-section').forEach(section => {
+            const guessBtn = section.querySelector('.guess-btn');
+            const options = section.querySelectorAll('.option-btn');
+            let selectedValue = null;
+
+            options.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    options.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedValue = this.dataset.value;
+                });
+            });
+
+            guessBtn.addEventListener('click', function() {
+                if (!selectedValue) return;
+
+                const feedback = section.querySelector('.guess-feedback');
+                const feedbackTexts = {
+                    question1: {
+                        b: {
+                            correct: true,
+                            text: "✓ Exactly! German saves the punchline—the infinitive verb at the end creates drama and emphasis. This isn't a bug; it's a feature. The action you actually want to perform comes last, making it the climax."
+                        },
+                        a: { correct: false, text: "✗ Not quite. This is actually very organized—it's a deliberate choice about how to structure meaning." },
+                        c: { correct: false, text: "✗ No, there's linguistic purpose here. German prioritizes dramatic suspense in sentence structure." },
+                        d: { correct: false, text: "✗ German and Latin have very different word order systems. German is positional and compound-based; Latin is inflectional." }
+                    },
+                    question2: {
+                        c: {
+                            correct: true,
+                            text: "✓ Yes! Luther did exactly this—he created a unified German by drawing from multiple dialects, and his Bible translation was so influential that his choices became the standard for written German. It's like Shakespeare shaping English."
+                        },
+                        a: { correct: false, text: "✗ That would be impractical and unlikely. Luther solved it by unifying." },
+                        b: { correct: false, text: "✗ The Pope wouldn't have approved translating the Bible into German at all—Luther did this against church authority." },
+                        d: { correct: false, text: "✗ Luther was committed to making the Bible available in German so ordinary people could read it." }
+                    },
+                    question3: {
+                        b: {
+                            correct: true,
+                            text: "✓ Correct! Both German and Chinese had a fracture between formal written language (Latin/Classical Chinese) and the language people actually spoke. Reformers like Luther and later Chinese reformers unified written and spoken language."
+                        },
+                        a: { correct: false, text: "✗ Chinese classics used Chinese characters, not Latin." },
+                        c: { correct: false, text: "✗ They're related languages, but the parallel is about the written/spoken fracture." },
+                        d: { correct: false, text: "✗ The parallel is real and important for understanding language evolution." }
+                    }
+                };
+
+                let questionKey = 'question' + (Array.from(document.querySelectorAll('.guess-section')).indexOf(section) + 1);
+                const feedbackData = feedbackTexts[questionKey][selectedValue];
+
+                feedback.className = 'guess-feedback show ' + (feedbackData.correct ? 'correct' : 'incorrect');
+                feedback.innerHTML = feedbackData.text;
+
+                if (feedbackData.correct) {
+                    options.forEach(b => {
+                        if (b.dataset.value === selectedValue) {
+                            b.classList.add('correct');
+                        }
+                    });
+                } else {
+                    const correctBtn = Array.from(options).find(b => feedbackTexts[questionKey][b.dataset.value]?.correct);
+                    if (correctBtn) {
+                        correctBtn.classList.add('correct');
+                    }
+                    options.forEach(b => {
+                        if (b.dataset.value === selectedValue) {
+                            b.classList.add('incorrect');
+                        }
+                    });
+                }
+            });
+        });
+
+        // Mobile optimizations
+        document.addEventListener('touchstart', function() {}, { passive: true });
+        document.addEventListener('touchend', function(e) {
+            if (e.target.classList.contains('option-btn') || e.target.classList.contains('guess-btn')) {
+                e.preventDefault();
+            }
+        }, { passive: true });
+    </script>
+</body>
+</html>

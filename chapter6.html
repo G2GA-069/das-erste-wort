@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Das erste Wort">
+    <meta name="theme-color" content="#0e1214">
+    <title>Das erste Wort: Chapter 6 - Die Uhr und die Maschine</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+SC:wght@400;600&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --german: #e8a44a;
+            --chinese: #c49a6c;
+            --english: #8a9bae;
+            --dark-slate: #0e1214;
+            --copper: #c48a4a;
+            --steel-blue: #4a6a8a;
+            --amber: #d4a44a;
+            --ink: #1a1c1e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            font-family: 'Noto Serif', serif;
+            background: var(--ink);
+            color: #e8e6e0;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        body {
+            padding: max(0px, env(safe-area-inset-bottom));
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* AMBIENT COFFEEHOUSE PARTICLES */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+            animation: drift linear infinite;
+        }
+
+        @keyframes drift {
+            0% {
+                opacity: 0;
+                transform: translateY(0) translateX(0);
+            }
+            10% {
+                opacity: 0.2;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) translateX(50px);
+            }
+        }
+
+        /* SCREENS */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* TITLE SCREEN */
+        .title-screen {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--ink) 0%, var(--dark-slate) 100%);
+        }
+
+        .title-screen h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--amber);
+            letter-spacing: 2px;
+        }
+
+        .title-screen .subtitle {
+            font-family: 'Noto Serif', serif;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            color: var(--copper);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .title-screen .chapter-number {
+            font-size: 1rem;
+            color: var(--steel-blue);
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .title-screen p {
+            max-width: 600px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #c0bdb8;
+            margin-bottom: 50px;
+        }
+
+        .btn {
+            padding: 12px 40px;
+            font-size: 1rem;
+            border: 2px solid var(--german);
+            background: transparent;
+            color: var(--german);
+            cursor: pointer;
+            font-family: 'Noto Serif', serif;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .btn:hover {
+            background: var(--german);
+            color: var(--ink);
+        }
+
+        /* CONTENT SCREENS */
+        .content-screen {
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            padding: 0;
+            z-index: 20;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-slate), var(--steel-blue));
+            padding: 60px 20px 40px;
+            text-align: center;
+            border-bottom: 2px solid var(--copper);
+            position: sticky;
+            top: 0;
+            z-index: 21;
+        }
+
+        .header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 6vw, 2.5rem);
+            color: var(--amber);
+            margin-bottom: 10px;
+        }
+
+        .header .german {
+            color: var(--german);
+        }
+
+        .header .english {
+            font-size: 1rem;
+            color: var(--english);
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--german);
+            width: 0%;
+            z-index: 30;
+            transition: width 0.3s ease;
+        }
+
+        .content-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            padding-bottom: 60px;
+        }
+
+        /* SCENES */
+        .scene {
+            margin-bottom: 60px;
+            padding: 30px;
+            background: rgba(30, 32, 34, 0.8);
+            border-left: 4px solid var(--copper);
+            border-radius: 0;
+        }
+
+        .scene h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: var(--amber);
+            margin-bottom: 15px;
+        }
+
+        .scene p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #d0ccb8;
+        }
+
+        .scene-em {
+            font-style: italic;
+            color: var(--amber);
+        }
+
+        /* CARDS */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .card {
+            background: rgba(20, 22, 25, 0.9);
+            border: 1px solid var(--copper);
+            padding: 25px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .card:hover {
+            background: rgba(30, 32, 34, 0.95);
+            border-color: var(--amber);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-flag {
+            font-size: 2rem;
+            margin-right: 12px;
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--german);
+        }
+
+        .card-word {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 1.5rem;
+            color: var(--amber);
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .card-breakdown {
+            font-size: 0.95rem;
+            color: var(--copper);
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .card-meaning {
+            color: #b8b4a8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* QUIZ SECTIONS */
+        .quiz-section {
+            background: rgba(20, 22, 25, 0.9);
+            border-left: 4px solid var(--steel-blue);
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 0;
+        }
+
+        .quiz-section h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--steel-blue);
+            margin-bottom: 25px;
+        }
+
+        .quiz-item {
+            margin-bottom: 30px;
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #d0ccb8;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-btn {
+            padding: 12px 20px;
+            text-align: left;
+            background: rgba(30, 32, 34, 0.8);
+            border: 1px solid var(--steel-blue);
+            color: #c0bdb8;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Noto Serif', serif;
+            border-radius: 0;
+        }
+
+        .quiz-btn:hover {
+            background: rgba(74, 106, 138, 0.3);
+            border-color: var(--amber);
+        }
+
+        .quiz-btn.correct {
+            background: rgba(40, 80, 40, 0.5);
+            border-color: #66bb66;
+            color: #88dd88;
+        }
+
+        .quiz-btn.incorrect {
+            background: rgba(80, 40, 40, 0.5);
+            border-color: #cc6666;
+            color: #ee9999;
+        }
+
+        .quiz-feedback {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            font-style: italic;
+            color: var(--copper);
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        /* COLLECTIONS */
+        .collection-section {
+            background: rgba(20, 22, 25, 0.9);
+            border: 1px solid var(--copper);
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 0;
+        }
+
+        .collection-section h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--amber);
+            margin-bottom: 20px;
+        }
+
+        .word-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .word-item {
+            background: rgba(30, 32, 34, 0.8);
+            padding: 15px;
+            border-left: 3px solid var(--german);
+        }
+
+        .word-german {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: var(--german);
+            margin-bottom: 5px;
+        }
+
+        .word-english {
+            font-size: 0.9rem;
+            color: var(--english);
+        }
+
+        /* INSIGHTS */
+        .insights-section {
+            background: linear-gradient(135deg, rgba(74, 106, 138, 0.2), rgba(196, 138, 74, 0.1));
+            border: 1px solid var(--steel-blue);
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 0;
+        }
+
+        .insights-section h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--steel-blue);
+            margin-bottom: 20px;
+        }
+
+        .insight {
+            margin-bottom: 25px;
+        }
+
+        .insight-label {
+            font-weight: 600;
+            color: var(--amber);
+            margin-bottom: 8px;
+        }
+
+        .insight-text {
+            color: #c0bdb8;
+            line-height: 1.7;
+        }
+
+        /* TEASER */
+        .teaser-section {
+            background: rgba(20, 22, 25, 0.9);
+            border-top: 2px solid var(--copper);
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .teaser-section h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--amber);
+            margin-bottom: 20px;
+        }
+
+        .teaser-text {
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+            color: #c0bdb8;
+            margin-bottom: 30px;
+        }
+
+        .final-line {
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--german);
+            margin-top: 30px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .title-screen h1 {
+                font-size: 2.2rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-wrapper {
+                padding: 30px 15px;
+            }
+
+            .scene {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .title-screen {
+                padding: 30px 15px;
+            }
+
+            .title-screen h1 {
+                font-size: 1.8rem;
+            }
+
+            .title-screen p {
+                font-size: 0.95rem;
+            }
+
+            .header {
+                padding: 50px 15px 30px;
+            }
+
+            .header h2 {
+                font-size: 1.6rem;
+            }
+
+            .content-wrapper {
+                padding: 25px 12px;
+            }
+
+            .quiz-options {
+                gap: 8px;
+            }
+
+            .quiz-btn {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+
+            .particle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .title-screen h1 {
+                font-size: 1.4rem;
+            }
+
+            .scene p, .card-meaning, .insight-text {
+                font-size: 0.9rem;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="particles" id="particles"></div>
+
+        <!-- TITLE SCREEN -->
+        <div class="screen active title-screen" id="titleScreen">
+            <div class="chapter-number">Chapter 6</div>
+            <h1>Die Uhr und<br>die Maschine</h1>
+            <div class="subtitle">The Clock and the Machine</div>
+            <p>Vienna, 1900. The world is changing at impossible speed. In one room, someone reads Freud. Someone argues about Marx. Someone hums Beethoven. A physicist scribbles equations that will reshape reality.</p>
+            <p>German is the language of the future — the language in which the modern world is being invented.</p>
+            <button class="btn" onclick="startChapter()">Enter the Coffeehouse</button>
+        </div>
+
+        <!-- SCENES SCREEN -->
+        <div class="screen content-screen" id="scenesScreen">
+            <div class="header">
+                <h2><span class="german">Die Uhr und die Maschine</span></h2>
+                <div class="english">The Clock and the Machine</div>
+            </div>
+
+            <div class="content-wrapper">
+                <!-- OPENING SCENE -->
+                <div class="scene">
+                    <h3>A Coffeehouse at the Turn of the Century</h3>
+                    <p>The Café Central in Vienna, 1900. A storm of ideas swirls through the steam rising from coffee cups. At one table, a young man with intense eyes scribbles notes on consciousness and the unconscious — his name is Sigmund Freud. At another, someone reads <span class="scene-em">Capital</span>, Marx's dense meditation on economics. In the corner, a musician sketches a melody, thinking about Beethoven's revolutionary forms.</p>
+                    <p>But the sound that defines this moment? It's the <span class="scene-em">ticking of clocks</span>. The modern world runs on time, on precision, on machines. The steam engine, the electric light, the telegraph — these are not just inventions. They are transformations of human consciousness itself.</p>
+                    <p>And the language in which all this is discussed, debated, theorized, composed? <span class="scene-em">German</span>.</p>
+                </div>
+
+                <!-- SECTION 1: WORDS GERMAN GAVE ENGLISH -->
+                <div class="scene">
+                    <h3>German's Gift to English</h3>
+                    <p>Something remarkable happened in the 19th and 20th centuries. As German became the language of science, philosophy, psychology, and music — as German thinkers reshaped how humans understand themselves — English began to borrow German words. Not because Germans invaded England, but because <span class="scene-em">English had no words for what Germans were naming</span>.</p>
+                    <p>When you feel an inexplicable sense of dread without an obvious cause, when you take pleasure in someone else's misfortune, when you have an urge to wander the world — English couldn't name these feelings. So English borrowed the German words.</p>
+                    <p>This is the reverse of everything you've learned so far. Previously, German borrowed from Latin, French, and English. Now, English must borrow from German. The language of ideas had spoken.</p>
+                </div>
+
+                <!-- WORD CARDS - SECTION 1 -->
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">🎯</span>
+                            <span class="card-title">Zeitgeist</span>
+                        </div>
+                        <div class="card-word">時代精神</div>
+                        <div class="card-breakdown">Zeit (time) + Geist (spirit)</div>
+                        <div class="card-meaning">The spirit of the age; the dominant mood, ideas, and beliefs of a particular era. When we say "that movie captures the zeitgeist," we mean it embodies the spirit of our time.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">🎒</span>
+                            <span class="card-title">Wanderlust</span>
+                        </div>
+                        <div class="card-word">旅遊慾</div>
+                        <div class="card-breakdown">Wandern (to wander) + Lust (desire)</div>
+                        <div class="card-meaning">A strong desire to travel and explore the world. It captures not just the wish to travel, but the deeper emotional pull — the <span class="scene-em">longing</span> itself.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">😰</span>
+                            <span class="card-title">Angst</span>
+                        </div>
+                        <div class="card-word">焦慮</div>
+                        <div class="card-breakdown">From Old High German: awe, fear</div>
+                        <div class="card-meaning">A deeper anxiety than English "anxiety." Existential dread. A free-floating sense that something is fundamentally wrong, even if you can't name what. This became crucial in philosophy and psychology.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">😈</span>
+                            <span class="card-title">Schadenfreude</span>
+                        </div>
+                        <div class="card-word">幸災樂禍</div>
+                        <div class="card-breakdown">Schaden (damage/harm) + Freude (joy)</div>
+                        <div class="card-meaning">A guilty pleasure at another person's misfortune. English has no word for this — we had to borrow from German because Germans understood this emotion well enough to name it precisely.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">⭐</span>
+                            <span class="card-title">Wunderkind</span>
+                        </div>
+                        <div class="card-word">神童</div>
+                        <div class="card-breakdown">Wunder (wonder/miracle) + Kind (child)</div>
+                        <div class="card-meaning">A child prodigy. A wonder-child. Mozart was the original Wunderkind. The word captures something romantic about precocious talent.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">👻</span>
+                            <span class="card-title">Doppelgänger</span>
+                        </div>
+                        <div class="card-word">雙身人</div>
+                        <div class="card-breakdown">Doppel (double) + Gänger (goer)</div>
+                        <div class="card-meaning">A ghostly double of a living person. A spectral companion or evil twin. The word carries an eerie, uncanny weight that English "double" doesn't capture.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">🧩</span>
+                            <span class="card-title">Gestalt</span>
+                        </div>
+                        <div class="card-word">完形</div>
+                        <div class="card-breakdown">From Old High German: form, shape</div>
+                        <div class="card-meaning">A unified whole; an organized configuration. In psychology: the principle that the whole is greater than the sum of its parts. You see a face, not individual features.</div>
+                    </div>
+                </div>
+
+                <!-- QUIZ 1: COMPOUND DECOMPOSITION -->
+                <div class="quiz-section">
+                    <h4>Quiz 1: Can You Break Down the Compounds?</h4>
+                    <div class="quiz-item">
+                        <div class="quiz-question">What do you think <span class="scene-em">Fernweh</span> (Fern = far, Weh = pain/ache) means?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQuiz(this, false)">A) The joy of traveling</button>
+                            <button class="quiz-btn" onclick="checkQuiz(this, true)">B) Homesickness; the pain of distance (literally "far-pain")</button>
+                            <button class="quiz-btn" onclick="checkQuiz(this, false)">C) Fear of foreigners</button>
+                        </div>
+                        <div class="quiz-feedback">Exactly! Fernweh is the opposite of Heimweh (homesickness). While Wanderlust is the desire to wander, Fernweh is the ache you feel for distant places. German has words for both.</div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <div class="quiz-question">What does <span class="scene-em">Übermensch</span> (Über = over/super, Mensch = human) suggest?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQuiz(this, false)">A) A man who is very tall</button>
+                            <button class="quiz-btn" onclick="checkQuiz(this, true)">B) A superhuman; a person who transcends ordinary human limitations (Nietzsche's concept)</button>
+                            <button class="quiz-btn" onclick="checkQuiz(this, false)">C) Someone who likes German food</button>
+                        </div>
+                        <div class="quiz-feedback">Yes! Nietzsche's Übermensch is one of the most influential ideas in modern philosophy. German's ability to build meaning through compounds made this concept possible.</div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: THE LANGUAGE OF MUSIC -->
+                <div class="scene">
+                    <h3>The Language of Music</h3>
+                    <p>Most musical terms come from Italian — <span class="scene-em">forte</span>, <span class="scene-em">piano</span>, <span class="scene-em">allegro</span>. But when composers needed words for new concepts, they often turned to German.</p>
+                    <p>Take <span class="scene-em">Lied</span> (song) — in its classical form, the German art song is so specific that English borrowed the German word. A Lied isn't just any song; it's a carefully crafted composition where music and poetry unite. Or <span class="scene-em">Leitmotif</span> — the musical phrase that represents a character or idea and returns throughout a composition. Wagner invented this concept, and the word itself couldn't exist without German's compound-building power.</p>
+                    <p>In the Vienna coffeehouse of 1900, music and philosophy are inseparable. They're written in the same language: German.</p>
+                </div>
+
+                <!-- SECTION 3: VERBS — FINALLY! -->
+                <div class="scene">
+                    <h3>The First Real Verbs: I Am, I Have, I Go</h3>
+                    <p>So far in our journey, we've mostly learned nouns and compounds. Now it's time for <span class="scene-em">verbs</span> — the words that let you <span class="scene-em">do</span> something, not just <span class="scene-em">name</span> something.</p>
+                    <p>In English, verbs can be wildly irregular. "I am, you are, he is" — three different forms! In German, the pattern is more predictable:</p>
+                </div>
+
+                <div class="card-grid">
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <span class="card-flag">🔵</span>
+                            <span class="card-title">The Verb "Sein" (To Be)</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.4); padding: 20px; margin: 15px 0; font-family: monospace; font-size: 1rem; color: var(--amber);">
+                            ich bin (I am)<br>
+                            du bist (you are — informal)<br>
+                            er/sie/es ist (he/she/it is)<br>
+                            <br>
+                            Notice: Three forms, just like English. But the logic is clearer.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">📖</span>
+                            <span class="card-title">Haben (To Have)</span>
+                        </div>
+                        <div style="margin: 15px 0; font-family: monospace; font-size: 0.95rem; color: var(--amber);">
+                            ich habe<br>
+                            du hast<br>
+                            er/sie/es hat
+                        </div>
+                        <div class="card-meaning">The most regular verb pattern. Notice the "-e, -st, -t" endings? That's the standard German verb pattern.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">🚶</span>
+                            <span class="card-title">Gehen (To Go)</span>
+                        </div>
+                        <div style="margin: 15px 0; font-family: monospace; font-size: 0.95rem; color: var(--amber);">
+                            ich gehe<br>
+                            du gehst<br>
+                            er/sie/es geht
+                        </div>
+                        <div class="card-meaning">Also regular. You can see the pattern emerging: the verb changes based on who's doing the action.</div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: DU VS. SIE -->
+                <div class="scene">
+                    <h3>A Cultural Moment: Du and Sie</h3>
+                    <p>English once had this distinction. You used "thou" with friends and family, and "you" with strangers and superiors. But English <span class="scene-em">lost</span> this distinction centuries ago.</p>
+                    <p>German <span class="scene-em">kept</span> it. And it matters.</p>
+                    <p><span class="scene-em">Du</span> is intimate, familiar, warm. You use it with friends, family, children, and (importantly) in German culture, with strangers once you've agreed to be familiar. <span class="scene-em">Sie</span> is formal, respectful, distant. You use it with authority figures, in professional settings, and with people you don't know well.</p>
+                    <p>This isn't a grammatical quirk. It's <span class="scene-em">encoded respect into the language itself</span>. When you call someone "du" instead of "Sie," you're saying: "I want to be close to you. I trust you."</p>
+                    <p>Here's something remarkable: <span class="scene-em">Chinese has the same distinction</span>. You (你, nǐ) is casual; you (您, nín) is formal and respectful. Both languages recognized that language must express social distance. English, in its democratic simplification, lost this nuance.</p>
+                </div>
+
+                <!-- QUIZ 2: FORMALITY MATCHING -->
+                <div class="quiz-section">
+                    <h4>Quiz 2: Which Would You Use?</h4>
+                    <div class="quiz-item">
+                        <div class="quiz-question">Your best friend asks you where you're going. Which form?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQuiz(this, true)">A) Wo gehst du hin? (intimate)</button>
+                            <button class="quiz-btn" onclick="checkQuiz(this, false)">B) Wo gehen Sie hin? (formal)</button>
+                        </div>
+                        <div class="quiz-feedback">Right! With your best friend, you use "du" — the intimate form. The verb changes: "gehst" instead of "gehen."</div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <div class="quiz-question">Your professor asks the same question. Which form?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQuiz(this, false)">A) Wo gehst du hin?</button>
+                            <button class="quiz-btn" onclick="checkQuiz(this, true)">B) Wo gehen Sie hin? (formal)</button>
+                        </div>
+                        <div class="quiz-feedback">Exactly! "Sie" is formal and respectful. You use the third-person plural verb "gehen" — the same form used for "they." This might seem odd, but it keeps distance while remaining polite.</div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <div class="quiz-question">In Chinese, the distinction is 你 (casual) vs. 您 (formal). Which is most similar to the German pattern?</div>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="checkQuiz(this, true)">A) Very similar — both languages mark respect through the choice of "you"</button>
+                            <button class="quiz-btn" onclick="checkQuiz(this, false)">B) Completely different — German is about grammar, Chinese is about politeness</button>
+                            <button class="quiz-btn" onclick="checkQuiz(this, false)">C) Chinese doesn't have formality markers</button>
+                        </div>
+                        <div class="quiz-feedback">Yes! Both German and Chinese recognize that social distance matters enough to encode it directly into the language. English lost this nuance, which some see as a democratic simplification and others as a loss of expressiveness.</div>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: COMPOUND FEELINGS -->
+                <div class="scene">
+                    <h3>The Deep Compounds: Naming the Unnameable</h3>
+                    <p>German's superpower is taking concepts that other languages struggle to express and compressing them into single words. Here are three of the most beautiful:</p>
+                </div>
+
+                <div class="card-grid">
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <span class="card-flag">🌍</span>
+                            <span class="card-title">Weltanschauung</span>
+                        </div>
+                        <div class="card-word">世界觀</div>
+                        <div class="card-breakdown">Welt (world) + Anschauung (view/outlook)</div>
+                        <div class="card-meaning">One's entire philosophy of life; the lens through which you see the world. It's more than an opinion — it's a fundamental worldview. This word is essential to German philosophy, from Hegel to Heidegger. (Notice: Chinese 世界觀 is literally a calque — a word-for-word translation from German!)</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">👆</span>
+                            <span class="card-title">Fingerspitzengefühl</span>
+                        </div>
+                        <div class="card-word">直覺敏感度</div>
+                        <div class="card-breakdown">Fingerspitzen (fingertips) + Gefühl (feeling)</div>
+                        <div class="card-meaning">Intuitive sensitivity; the feeling at your fingertips. A subtle, almost supernatural sense of what's right in a situation. Not learned, but felt through experience. Diplomats and psychologists need Fingerspitzengefühl.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-flag">🏡</span>
+                            <span class="card-title">Gemütlichkeit</span>
+                        </div>
+                        <div class="card-word">舒適愜意</div>
+                        <div class="card-breakdown">Gemüt (mood/disposition) + -lichkeit (quality of)</div>
+                        <div class="card-meaning">Coziness, but so much more. A state of warmth, contentment, and belonging. A gathering of friends on a winter evening with wine and candlelight — that's Gemütlichkeit. It's not just comfort; it's <span class="scene-em">felt</span> comfort, a sense of being at home, of being accepted.</div>
+                    </div>
+                </div>
+
+                <!-- COLLECTION: VERBS OF THIS CHAPTER -->
+                <div class="collection-section">
+                    <h4>Core Verbs from Chapter 6</h4>
+                    <div class="word-list">
+                        <div class="word-item">
+                            <div class="word-german">sein</div>
+                            <div class="word-english">to be</div>
+                        </div>
+                        <div class="word-item">
+                            <div class="word-german">haben</div>
+                            <div class="word-english">to have</div>
+                        </div>
+                        <div class="word-item">
+                            <div class="word-german">gehen</div>
+                            <div class="word-english">to go</div>
+                        </div>
+                        <div class="word-item">
+                            <div class="word-german">ich habe Wanderlust</div>
+                            <div class="word-english">I have wanderlust</div>
+                        </div>
+                        <div class="word-item">
+                            <div class="word-german">ich bin hier</div>
+                            <div class="word-english">I am here</div>
+                        </div>
+                        <div class="word-item">
+                            <div class="word-german">du bist</div>
+                            <div class="word-english">you are (intimate)</div>
+                        </div>
+                        <div class="word-item">
+                            <div class="word-german">Sie gehen</div>
+                            <div class="word-english">you go (formal)</div>
+                        </div>
+                        <div class="word-item">
+                            <div class="word-german">Lied</div>
+                            <div class="word-english">art song</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INSIGHTS -->
+                <div class="insights-section">
+                    <h4>Chapter Insights: The Golden Age</h4>
+
+                    <div class="insight">
+                        <div class="insight-label">Why German Dominated the 19th Century</div>
+                        <div class="insight-text">Germany wasn't the largest or most powerful nation in Europe. But it was the center of intellectual life. The University of Berlin became the model for universities worldwide. German philosophers (Hegel, Nietzsche, Marx) reshaped how humans understood themselves. German composers (Beethoven, Wagner, Brahms) transformed music itself. German scientists (Einstein, Planck, Heisenberg) created modern physics. When you wanted to be at the cutting edge of knowledge, you learned German. The language itself became synonymous with rigor, depth, and intellectual power.</div>
+                    </div>
+
+                    <div class="insight">
+                        <div class="insight-label">The Calque: Chinese and German Understanding Each Other</div>
+                        <div class="insight-text">When Chinese scholars encountered German philosophy in the 19th century, they didn't just translate individual words — they recognized something in German's compound structure that matched Chinese. So 世界觀 (world-view-looking) is a perfect calque of Weltanschauung. 時代精神 (era-spirit-looking) is Zeitgeist. This wasn't accident. Both languages, separated by thousands of miles and centuries of separate development, had converged on similar ways of naming complex ideas. It's as if German and Chinese recognized each other as philosophical languages.</div>
+                    </div>
+
+                    <div class="insight">
+                        <div class="insight-label">From Names to Actions</div>
+                        <div class="insight-text">In the first five chapters, we learned almost entirely through nouns. "Mutter," "Brot," "Freund," "Abenteuer" — we learned to <span class="scene-em">name</span> the world. But language isn't just about naming. It's about doing. With "sein," "haben," and "gehen," we can finally construct simple sentences. "Ich bin hier. Du hast Wanderlust. Er geht." These are your first complete thoughts in German. They're small, but they're real speech. In the next phase of our journey, we'll build on this foundation to actually speak, not just understand.</div>
+                    </div>
+
+                    <div class="insight">
+                        <div class="insight-label">Respect Encoded in Grammar</div>
+                        <div class="insight-text">The du/Sie distinction reveals something deep about language and culture. German (like Chinese) believes that respect should be built into the language itself. English lost this, opting for simplicity. This isn't better or worse — it's a different choice. But it means that in German, every time you speak to someone, you're making a choice about distance and respect. Language isn't neutral. It carries cultural values built into its very grammar.</div>
+                    </div>
+                </div>
+
+                <!-- TEASER -->
+                <div class="teaser-section">
+                    <h4>Looking Ahead: The Weight of Words</h4>
+                    <div class="teaser-text">
+                        We've traveled from the steppe to the coffeehouse. From "Mutter" to "Weltanschauung." From observing a language to beginning to speak it.
+                        <br><br>
+                        But this golden age of German — this time when the language seemed to contain all the world's deepest ideas — would soon be tested by history itself. In the coming decades, the very same language that produced Goethe and Mozart and Einstein would be twisted, weaponized, and corrupted. The words we've learned will take on darker meanings. And yet the language would survive, transform, and ultimately prove that no words, no matter how twisted, can kill a language's power to communicate truth, beauty, and the human desire to connect.
+                        <br><br>
+                        The next chapter explores that turning point. But first, you have something precious: <span class="scene-em">enough words to start speaking</span>. In the next phase of our journey together, the coffeehouse door will open, and you'll step inside not as an observer, but as a participant.
+                    </div>
+                    <div class="final-line">
+                        "Ich bin hier. Du bist hier. Wir sind bereit."<br>
+                        (I am here. You are here. We are ready.)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <script>
+        // PARTICLES
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = window.innerWidth > 600 ? 20 : 8;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const size = Math.random() * 3 + 1;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 15;
+                const opacity = Math.random() * 0.2 + 0.1;
+
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = '-10px';
+                particle.style.background = 'rgba(232, 164, 74, ' + opacity + ')';
+                particle.style.animationDelay = delay + 's';
+                particle.style.animationDuration = duration + 's';
+                particle.style.opacity = opacity;
+
+                container.appendChild(particle);
+            }
+        }
+
+        // SCREEN NAVIGATION
+        function startChapter() {
+            document.getElementById('titleScreen').classList.remove('active');
+            document.getElementById('scenesScreen').classList.add('active');
+            updateProgress();
+        }
+
+        // PROGRESS TRACKING
+        function updateProgress() {
+            const screen = document.getElementById('scenesScreen');
+            if (!screen.classList.contains('active')) return;
+
+            const scrollHeight = screen.scrollHeight - screen.clientHeight;
+            const scrolled = screen.scrollTop;
+            const progress = scrollHeight > 0 ? (scrolled / scrollHeight) * 100 : 0;
+
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // QUIZ FUNCTIONALITY
+        function checkQuiz(button, isCorrect) {
+            const item = button.closest('.quiz-item');
+            const buttons = item.querySelectorAll('.quiz-btn');
+            const feedback = item.querySelector('.quiz-feedback');
+
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+            });
+
+            if (isCorrect) {
+                button.classList.add('correct');
+            } else {
+                button.classList.add('incorrect');
+            }
+
+            if (feedback) {
+                feedback.classList.add('show');
+            }
+        }
+
+        // OBSERVER FOR LAZY LOADING / ANIMATIONS
+        function setupObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.scene, .card, .quiz-section').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(10px)';
+                el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(el);
+            });
+        }
+
+        // TOUCH OPTIMIZATIONS
+        function addTouchOptimizations() {
+            document.addEventListener('touchmove', function(e) {
+                // Allow natural scrolling
+            }, { passive: true });
+
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(e) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
+
+        // INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            setupObserver();
+            addTouchOptimizations();
+        });
+
+        // UPDATE PROGRESS ON SCROLL
+        document.addEventListener('scroll', updateProgress);
+        document.getElementById('scenesScreen')?.addEventListener('scroll', updateProgress);
+
+        // KEYBOARD NAVIGATION
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (!document.getElementById('titleScreen').classList.contains('active')) {
+                    document.getElementById('scenesScreen').classList.remove('active');
+                    document.getElementById('titleScreen').classList.add('active');
+                    document.getElementById('progressBar').style.width = '0%';
+                }
+            }
+        });
+
+        // VIEWPORT HEIGHT ADJUSTMENT FOR MOBILE
+        function setVH() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', vh + 'px');
+        }
+        window.addEventListener('resize', setVH);
+        setVH();
+    </script>
+</body>
+</html>
